@@ -20,7 +20,7 @@ React/Redux for realtime rendering, Three.js for rendering in 3D and Howler.js f
 
 ## Wireframes
 
-![image of main layout](/wireframes/main_layout.jpg)
+![image of main layout](/docs/wireframes/main_layout.jpg)
 
 ## Implementation Timeline
 
