@@ -72,7 +72,10 @@ main h1 {
 .display-aside:hover,
 .grid-toggle:hover,
 .view-toggle:hover,
-.restart-toggle:hover {
+.restart-toggle:hover,
+.github-img:hover,
+.angellist-img:hover,
+.linkedin-img:hover {
   opacity: 0.8;
   -moz-transform: scaleX(-1);
   -o-transform: scaleX(-1);
@@ -187,7 +190,7 @@ main h1 {
 
 .grid {
   width: 16px;
-  opacity: .1;
+  opacity: .2;
   background-color: white;
 }
 
@@ -254,4 +257,41 @@ main h1 {
 .view-toggle img,
 .restart-toggle img {
   width: 100%;
+}
+
+
+.contact-container {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  width: 180px;
+  text-align: center;
+  border: solid 2px white;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.contact-container p {
+  color: white;
+  font-size: 14px;
+  display: block;
+}
+
+.contact-icons-box {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.github-img,
+.angellist-img,
+.linkedin-img {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+}
+
+.contact-icons-box img {
+  width: 100%;
+  height: auto;
 }

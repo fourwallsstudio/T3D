@@ -114,8 +114,11 @@ export const moveCubes = (newShape, speed, boost) => {
 
 
 export const moveLeft = shape => {
-  if (!shape.some( c => stillShapes[c.position.x - 1]
-    .includes(Math.floor(c.position.y)) ) &&
+  if (!shape.some( c => {
+    return stillShapes[c.position.x - 1] &&
+    stillShapes[c.position.x - 1]
+      .includes(Math.floor(c.position.y))
+    }) &&
     shape.every( c => c.position.x > -5) ) {
 
     shape.forEach( c => c.position.x -= 1);
@@ -123,8 +126,11 @@ export const moveLeft = shape => {
 }
 
 export const moveRight = shape => {
-  if (!shape.some( c => stillShapes[c.position.x + 1]
-    .includes(Math.floor(c.position.y)) ) &&
+  if (!shape.some( c => {
+    return stillShapes[c.position.x + 1] &&
+    stillShapes[c.position.x + 1]
+      .includes(Math.floor(c.position.y))
+  }) &&
     shape.every( c => c.position.x < 6) ) {
 
     shape.forEach( c => c.position.x += 1);
@@ -132,11 +138,35 @@ export const moveRight = shape => {
 }
 
 export const rotateShape = (newShape, newRotateDeltas, shapeDeltaIndex) => {
+  let newD = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length]
+
+    for (let i = 0; i < newShape.length; i++) {
+      let d = newD[i];
+      newShape[i].position.x += d[0];
+      newShape[i].position.y += d[1];
+    }
+
+}
+
+export const rotatable = (newShape, newRotateDeltas, shapeDeltaIndex) => {
+  let newD = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length]
+  let newXPosition = [];
+
   for (let i = 0; i < newShape.length; i++) {
-    let d = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length][i]
-    newShape[i].position.x += d[0];
-    newShape[i].position.y += d[1];
+    let d = newD[i];
+    let newX = newShape[i].position.x + d[0];
+
+    if (newX > 6 || newX < -5) {
+      return false
+
+    } else if (stillShapes[newX]
+        .includes(Math.ceil(newShape[i].position.y + d[1]) - 1)) {
+
+          return false
+        }
   }
+
+    return true;
 }
 
 export const nextShape = idx => {

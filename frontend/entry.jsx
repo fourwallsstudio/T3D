@@ -9,8 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const store = configureStore();
 
-  window.getState = store.getState;
-
   ReactDOM.render(<Root store={ store }/>, document.getElementById('root'));
   ReactDOM.render(<ThreeCanvas store={ store } />, document.getElementById('myCanvas'));
 });
