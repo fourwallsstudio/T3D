@@ -67,8 +67,10 @@ const ThreeCanvas = props => {
     switch(e.key) {
 
       case "w":
-        Game.rotateShape(newShape, newRotateDeltas, shapeDeltaIndex);
-        shapeDeltaIndex += 1;
+        if (Game.rotatable(newShape, newRotateDeltas, shapeDeltaIndex)) {
+          Game.rotateShape(newShape, newRotateDeltas, shapeDeltaIndex);
+          shapeDeltaIndex += 1;
+        }
         break;
 
       case "s":
@@ -147,7 +149,6 @@ const ThreeCanvas = props => {
           speed = Game.speed();
         }
     }
-
 
     if (!newShape.some( c => Game.stillShapes[c.position.x]
       .includes(Math.ceil(c.position.y) - 1) )) {

@@ -11,7 +11,7 @@ T3D is a 3D spin on the classic Tetris game.
 ## Technologies, Libraries, APIs
 
 On top of vanilla JavaScript, HTML, and CSS, T3D was built using
-React/Redux for realtime rendering, Three.js for rendering in 3D and Howler.js for music and sound effects.
+React/Redux for realtime rendering, Three.js for rendering in 3D and Howler.js for music.
 
 
 ![image of view layout](/docs/screenshots/tetris_view.png)
