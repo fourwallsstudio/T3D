@@ -8,6 +8,7 @@ class Player extends React.Component {
 
     this.state = {
       sound: null,
+      firstPlay: true,
       isPaused: true,
       gameStatus: "",
       level: 1
@@ -41,47 +42,51 @@ class Player extends React.Component {
     if (this.state.gameStatus !== prevState.gameStatus) {
 
       if (this.state.gameStatus === 'playing') {
-        if (this.state.isPaused) {
           this.state.sound.play();
-          this.setState({ isPaused: false });
-        }
 
       } else if (this.state.gameStatus === 'paused' ||
       this.state.gameStatus === 'gameover') {
         this.state.sound.pause();
-        this.setState({ isPaused: true });
+        // this.setState({ isPaused: true });
       }
     }
 
   if (this.state.level !== prevState.level) {
     if (this.state.level === 7) {
         this.state.sound.play();
-        this.state.sound.fade(0, 1, 2000);
-        this.setState({ isPaused: false });
+        if (!this.state.isPaused) {
+          this.state.sound.fade(0, 0.5, 2000);
+        }
     }
   }
 }
 
   howlerPlayer(source) {
-    if (this.state.sound) { this.state.sound.fade(1, 0, 1000); }
+    if (this.state.sound) {
+      if (this.state.isPaused) {
+        this.state.sound
+      } else {
+        this.state.sound.fade(0.5, 0, 1000);
+      }
+    }
 
     const howlPlay = new Howl({
       src: [source],
+      volume: 0
     })
 
     this.setState({
       sound: howlPlay,
-      isPaused: true
     })
   }
 
   handleVolume() {
     if (this.state.isPaused) {
-      this.state.sound.play();
+      this.state.sound.volume(0.5);
       this.setState({ isPaused: false })
 
     } else {
-      this.state.sound.pause();
+      this.state.sound.volume(0);
       this.setState({ isPaused: true })
     }
   }

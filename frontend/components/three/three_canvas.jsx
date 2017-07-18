@@ -131,7 +131,7 @@ const ThreeCanvas = props => {
   const animate = () => {
 
     if ( Game.over() ) {
-      props.updateGameStatus("gameover")
+      props.updateGameStatus("gameover");
       playAndPause();
     }
 

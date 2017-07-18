@@ -70,6 +70,15 @@ class Displays extends React.Component {
         <div className={"opening" + hidden}>
           <h1>t3d</h1>
           <img  src="assets/playpause.png"></img>
+          <p>
+            t3d is a 3d version of the classic tetris game. <br /><br />
+            Use the keyboard to play: <br /><br />
+            "a": move left <br />
+            "d": move right <br />
+            "w": rotate piece <br />
+            "a": drop piece <br /><br />
+            "p": play / pause game <br />
+        </p>
         </div>
         <div className={"gameover-display" + gameover}>
           <h1>game over</h1>
@@ -115,16 +124,16 @@ class Displays extends React.Component {
         </div>
 
         <div className="contact-container">
-          <a href="http://calvinmcelroy.us/"><p>calvinmcelroy.us</p></a>
+          <a href="http://calvinmcelroy.us/" target="_blank"><p>calvinmcelroy.us</p></a>
           <a href="mailto:fourwallsstudio@gmail.com"><p>fourwallsstudio@gmail.com</p></a>
           <div className="contact-icons-box">
-            <a href="https://github.com/fourwallsstudio" className="github-img">
+            <a href="https://github.com/fourwallsstudio" target="_blank" className="github-img">
               <img src="assets/github.png"></img>
             </a>
-            <a href="https://angel.co/calvin-mcelroy-1" className="angellist-img">
+            <a href="https://angel.co/calvin-mcelroy-1" target="_blank" className="angellist-img">
               <img src="assets/angellist.png"></img>
             </a>
-            <a href="https://www.linkedin.com/in/calvin-mcelroy-04253210b/" className="linkedin-img">
+            <a href="https://www.linkedin.com/in/calvin-mcelroy-04253210b/" target="_blank" className="linkedin-img">
               <img src="assets/linkedin.png"></img>
             </a>
           </div>
