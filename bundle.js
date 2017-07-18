@@ -69178,7 +69178,28 @@ var Displays = function (_React$Component) {
             null,
             't3d'
           ),
-          _react2.default.createElement('img', { src: 'assets/playpause.png' })
+          _react2.default.createElement('img', { src: 'assets/playpause.png' }),
+          _react2.default.createElement(
+            'p',
+            null,
+            't3d is a 3d version of the classic tetris game. ',
+            _react2.default.createElement('br', null),
+            _react2.default.createElement('br', null),
+            'Use the keyboard to play: ',
+            _react2.default.createElement('br', null),
+            _react2.default.createElement('br', null),
+            '"a": move left ',
+            _react2.default.createElement('br', null),
+            '"d": move right ',
+            _react2.default.createElement('br', null),
+            '"w": rotate piece ',
+            _react2.default.createElement('br', null),
+            '"a": drop piece ',
+            _react2.default.createElement('br', null),
+            _react2.default.createElement('br', null),
+            '"p": play / pause game ',
+            _react2.default.createElement('br', null)
+          )
         ),
         _react2.default.createElement(
           'div',
@@ -69266,7 +69287,7 @@ var Displays = function (_React$Component) {
           { className: 'contact-container' },
           _react2.default.createElement(
             'a',
-            { href: 'http://calvinmcelroy.us/' },
+            { href: 'http://calvinmcelroy.us/', target: '_blank' },
             _react2.default.createElement(
               'p',
               null,
@@ -69287,17 +69308,17 @@ var Displays = function (_React$Component) {
             { className: 'contact-icons-box' },
             _react2.default.createElement(
               'a',
-              { href: 'https://github.com/fourwallsstudio', className: 'github-img' },
+              { href: 'https://github.com/fourwallsstudio', target: '_blank', className: 'github-img' },
               _react2.default.createElement('img', { src: 'assets/github.png' })
             ),
             _react2.default.createElement(
               'a',
-              { href: 'https://angel.co/calvin-mcelroy-1', className: 'angellist-img' },
+              { href: 'https://angel.co/calvin-mcelroy-1', target: '_blank', className: 'angellist-img' },
               _react2.default.createElement('img', { src: 'assets/angellist.png' })
             ),
             _react2.default.createElement(
               'a',
-              { href: 'https://www.linkedin.com/in/calvin-mcelroy-04253210b/', className: 'linkedin-img' },
+              { href: 'https://www.linkedin.com/in/calvin-mcelroy-04253210b/', target: '_blank', className: 'linkedin-img' },
               _react2.default.createElement('img', { src: 'assets/linkedin.png' })
             )
           )
@@ -69361,6 +69382,7 @@ var Player = function (_React$Component) {
 
     _this.state = {
       sound: null,
+      firstPlay: true,
       isPaused: true,
       gameStatus: "",
       level: 1
@@ -69399,21 +69421,19 @@ var Player = function (_React$Component) {
       if (this.state.gameStatus !== prevState.gameStatus) {
 
         if (this.state.gameStatus === 'playing') {
-          if (this.state.isPaused) {
-            this.state.sound.play();
-            this.setState({ isPaused: false });
-          }
+          this.state.sound.play();
         } else if (this.state.gameStatus === 'paused' || this.state.gameStatus === 'gameover') {
           this.state.sound.pause();
-          this.setState({ isPaused: true });
+          // this.setState({ isPaused: true });
         }
       }
 
       if (this.state.level !== prevState.level) {
         if (this.state.level === 7) {
           this.state.sound.play();
-          this.state.sound.fade(0, 1, 2000);
-          this.setState({ isPaused: false });
+          if (!this.state.isPaused) {
+            this.state.sound.fade(0, 0.5, 2000);
+          }
         }
       }
     }
@@ -69421,26 +69441,30 @@ var Player = function (_React$Component) {
     key: 'howlerPlayer',
     value: function howlerPlayer(source) {
       if (this.state.sound) {
-        this.state.sound.fade(1, 0, 1000);
+        if (this.state.isPaused) {
+          this.state.sound;
+        } else {
+          this.state.sound.fade(0.5, 0, 1000);
+        }
       }
 
       var howlPlay = new _howler.Howl({
-        src: [source]
+        src: [source],
+        volume: 0
       });
 
       this.setState({
-        sound: howlPlay,
-        isPaused: true
+        sound: howlPlay
       });
     }
   }, {
     key: 'handleVolume',
     value: function handleVolume() {
       if (this.state.isPaused) {
-        this.state.sound.play();
+        this.state.sound.volume(0.5);
         this.setState({ isPaused: false });
       } else {
-        this.state.sound.pause();
+        this.state.sound.volume(0);
         this.setState({ isPaused: true });
       }
     }
@@ -72622,7 +72646,8 @@ var allCubes = exports.allCubes = {
   '8': [], '9': [], '10': [], '11': [],
   '12': [], '13': [], '14': [], '15': [],
   '16': [], '17': [], '18': [], '19': [],
-  '20': [], '21': [], '22': [], '23': []
+  '20': [], '21': [], '22': [], '23': [],
+  '24': []
 };
 
 var stillShapes = exports.stillShapes = {

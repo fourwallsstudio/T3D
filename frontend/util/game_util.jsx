@@ -9,7 +9,8 @@ export const allCubes = {
   '8': [], '9': [], '10': [], '11': [],
   '12': [], '13': [], '14': [], '15': [],
   '16': [], '17': [], '18': [], '19': [],
-  '20': [], '21': [], '22': [], '23': []
+  '20': [], '21': [], '22': [], '23': [],
+  '24': []
 }
 
 export const stillShapes = {
@@ -182,6 +183,7 @@ export const nextShape = idx => {
 
   return newShape;
 }
+
 
 export const over = () => {
   return stillShapes[0].includes(21) ? true : false
