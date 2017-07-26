@@ -50931,7 +50931,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 var THREE = __webpack_require__(35);
 
-//SHAPES
+// SHAPES
 var geometry = new THREE.BoxGeometry(1, 1, 1);
 
 var material = new THREE.MeshPhongMaterial({
@@ -89805,7 +89805,7 @@ var ThreeCanvas = function ThreeCanvas(props) {
 
       case "p":
         playAndPause();
-        aiPlay(aiMoves);
+        aiPlay.apply(undefined, _toConsumableArray(aiMoves));
         break;
 
       case "r":
@@ -89823,6 +89823,7 @@ var ThreeCanvas = function ThreeCanvas(props) {
 
   var toggleView = function toggleView() {
     if (viewRegular) {
+
       camera.position.z = 4;
       camera.position.y = -2;
       camera.lookAt(new THREE.Vector3(0.5, 24, -5));
@@ -89845,39 +89846,38 @@ var ThreeCanvas = function ThreeCanvas(props) {
   var shapeDeltas = Shape.deltas[shapeIndex % 7];
   var aiMoves = AI.generateMove(shapeDeltas, newRotateDeltas);
 
-  var aiPlay = function aiPlay(aiMoves) {
-    var moveIndex = aiMoves[0];
-    var rotations = aiMoves[1];
+  var aiPlay = function aiPlay(moveIndex, rotations) {
 
-    for (var i = 0; i < rotations; i++) {
-      Game.rotateShape(newShape, newRotateDeltas, i);
-      shapeDeltaIndex += 1;
-    }
+    aiRotate(rotations);
 
-    var furthestLeftIndex = findFurthestLeft(newShape);
+    aiMakeMove(moveIndex);
 
-    while (newShape[furthestLeftIndex].position.x !== moveIndex) {
-      if (moveIndex < newShape[furthestLeftIndex].position.x) {
-        Game.moveLeft(newShape);
-      } else {
-        Game.moveRight(newShape);
-      }
-    }
     boost = .3;
   };
 
-  var findFurthestLeft = function findFurthestLeft(newShape) {
-    var mostLeftX = 0;
-    var mostLeftIndex = 0;
+  var aiRotate = function aiRotate(rotations) {
 
-    newShape.forEach(function (cube, i) {
-      if (cube.position.x < mostLeftX) {
-        mostLeftX = cube.position.x;
-        mostLeftIndex = i;
+    for (var i = 0; i < rotations; i++) {
+
+      Game.rotateShape(newShape, newRotateDeltas, i);
+      shapeDeltaIndex += 1;
+    }
+  };
+
+  var aiMakeMove = function aiMakeMove(moveIndex) {
+
+    var furthestLeftIndex = AI.findFurthestLeft(newShape);
+
+    while (newShape[furthestLeftIndex].position.x !== moveIndex) {
+
+      if (moveIndex < newShape[furthestLeftIndex].position.x) {
+
+        Game.moveLeft(newShape);
+      } else {
+
+        Game.moveRight(newShape);
       }
-    });
-
-    return mostLeftIndex;
+    }
   };
 
   // ANIMATION
@@ -89933,7 +89933,7 @@ var ThreeCanvas = function ThreeCanvas(props) {
 
       shapeDeltas = Shape.deltas[shapeIndex % 7];
       aiMoves = AI.generateMove(shapeDeltas, newRotateDeltas);
-      aiPlay(aiMoves);
+      aiPlay.apply(undefined, _toConsumableArray(aiMoves));
     }
 
     aniFrame = requestAnimationFrame(animate);
@@ -90044,7 +90044,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generateMove = undefined;
+exports.findFurthestLeft = exports.generateMove = undefined;
 
 var _shapes_util = __webpack_require__(58);
 
@@ -90066,7 +90066,9 @@ var THREE = __webpack_require__(35);
 var aiStillShapes = void 0;
 
 var getAiStillShapes = function getAiStillShapes() {
+
   aiStillShapes = [];
+
   for (var i = 0; i < 12; i++) {
     aiStillShapes.push(Game.stillShapes[(i - 5).toString()]);
   }
@@ -90074,35 +90076,98 @@ var getAiStillShapes = function getAiStillShapes() {
 
 var aiRows = Game.allCubes;
 
+// GENERATE MOVE
 var generateMove = exports.generateMove = function generateMove(deltas, rotateDeltas) {
-  // console.log("deltas", deltas)
-  var rotations = widestFlatSurface(deltas, rotateDeltas);
-  var newDeltas = getDeltas(rotations, deltas, rotateDeltas);
+
+  var newDeltas = deltas;
+  var rotations = 0;
+
+  if (flatnessMinReached()) {
+    rotations = widestFlatSurface(deltas, rotateDeltas);
+    newDeltas = getDeltas(rotations, deltas, rotateDeltas);
+  }
+
   var layer = bottomSurfaceOfPiece(newDeltas);
-  return topSurfaceInRange(layer, rotations);
+  var moveToIndex = matchPieceToStillShapes(layer);
+
+  return [moveToIndex, rotations];
+};
+
+// FIND FURTHEST LEFT CUBE
+var findFurthestLeft = exports.findFurthestLeft = function findFurthestLeft(newShape) {
+  var mostLeftX = 0;
+  var mostLeftIndex = 0;
+
+  newShape.forEach(function (cube, i) {
+    if (cube.position.x < mostLeftX) {
+      mostLeftX = cube.position.x;
+      mostLeftIndex = i;
+    }
+  });
+
+  return mostLeftIndex;
+};
+
+// CONTINUOUS FLATNESS OF BOARD IS > 4 ?
+
+var flatnessMinReached = function flatnessMinReached() {
+
+  getAiStillShapes();
+
+  var longestFlat = 0;
+  var currentY = 0;
+  var currentFlat = 0;
+
+  aiStillShapes.forEach(function (col) {
+    var colMax = Math.max.apply(Math, _toConsumableArray(col));
+
+    if (currentY !== colMax) {
+
+      if (currentFlat > longestFlat) {
+        longestFlat = currentFlat;
+      }
+      currentY = colMax;
+      currentFlat = 1;
+    } else {
+
+      currentFlat += 1;
+    }
+  });
+
+  if (currentFlat > longestFlat) {
+    longestFlat = currentFlat;
+  }
+
+  return longestFlat > 4;
 };
 
 // FIND WIDEST FLAT SURFACE BY ROTATION
 
 var widestFlatSurface = function widestFlatSurface(deltas, rotateDeltas) {
+
   var currentDeltas = deltas.map(function (delta) {
     return [delta[0], delta[1]];
   });
+
   var widestFlatSurface = 0;
   var widestRotation = 0;
   var rotations = 0;
 
   for (var i = 0; i < rotateDeltas.length; i++) {
+
     var currentSurface = {};
     rotations += 1;
 
     for (var j = 0; j < rotateDeltas[i].length; j++) {
+
       currentDeltas[j][0] += rotateDeltas[i][j][0];
       currentDeltas[j][1] += rotateDeltas[i][j][1];
 
       if (currentSurface[currentDeltas[j][0]]) {
+
         currentSurface[currentDeltas[j][0]] += 1;
       } else {
+
         currentSurface[currentDeltas[j][0]] = 1;
       }
     }
@@ -90110,6 +90175,7 @@ var widestFlatSurface = function widestFlatSurface(deltas, rotateDeltas) {
     var currentWidestSurface = (0, _lodash.values)(currentSurface).length;
 
     if (currentWidestSurface > widestFlatSurface) {
+
       widestFlatSurface = currentWidestSurface;
       widestRotation = rotations;
     }
@@ -90121,6 +90187,7 @@ var widestFlatSurface = function widestFlatSurface(deltas, rotateDeltas) {
 };
 
 var getDeltas = function getDeltas(rotations, deltas, rotateDeltas) {
+
   var currentDeltas = deltas.map(function (delta) {
     return [delta[0], delta[1]];
   });
@@ -90128,6 +90195,7 @@ var getDeltas = function getDeltas(rotations, deltas, rotateDeltas) {
   for (var i = 0; i < rotations; i++) {
 
     for (var j = 0; j < rotateDeltas[i].length; j++) {
+
       currentDeltas[j][0] += rotateDeltas[i][j][0];
       currentDeltas[j][1] += rotateDeltas[i][j][1];
     }
@@ -90139,6 +90207,7 @@ var getDeltas = function getDeltas(rotations, deltas, rotateDeltas) {
 // MATCH PIECE SHAPE TO STILL SHAPES
 
 var bottomSurfaceOfPiece = function bottomSurfaceOfPiece(deltas) {
+
   var layer = [];
   var currentX = null;
 
@@ -90160,23 +90229,26 @@ var bottomSurfaceOfPiece = function bottomSurfaceOfPiece(deltas) {
     });
   }
 
-  console.log("layer", layer);
   return layer;
 };
 
-var topSurfaceInRange = function topSurfaceInRange(layer, rotations) {
+var matchPieceToStillShapes = function matchPieceToStillShapes(layer) {
+
   getAiStillShapes();
+
   var lowestReference = null;
   var lowestIndex = null;
   var lowestRange = null;
   var lowestRangeIndex = null;
 
   for (var i = 0; i + layer.length - 1 < aiStillShapes.length; i++) {
+
     var aligned = false;
     var reference = null;
     var currentRange = 0;
 
     for (var j = 0; j < layer.length; j++) {
+
       var colMaxHeight = Math.max.apply(Math, _toConsumableArray(aiStillShapes[i + j]));
       currentRange += colMaxHeight;
 
@@ -90198,12 +90270,14 @@ var topSurfaceInRange = function topSurfaceInRange(layer, rotations) {
 
     if (aligned) {
       if (lowestReference === null || reference < lowestReference) {
+
         lowestReference = reference;
         lowestIndex = i;
       }
     }
 
     if (lowestRange === null || currentRange < lowestRange) {
+
       lowestRange = currentRange;
       lowestRangeIndex = i;
     }
@@ -90213,24 +90287,36 @@ var topSurfaceInRange = function topSurfaceInRange(layer, rotations) {
     currentRange = 0;
   }
 
-  var lowestIdx = lowestIndex === null ? -5 + lowestRangeIndex : -5 + lowestIndex;
-
-  return [lowestIdx, rotations];
+  return lowestIndex === null ? -5 + lowestRangeIndex : -5 + lowestIndex;
 };
 
-// FIND LOWEST MOVE
+var topSurfaceInRange = function topSurfaceInRange(start, range) {
 
+  var layer = [];
+  var reference = Math.max.apply(Math, _toConsumableArray(aiStillShapes[start]));
 
-var fullRows = function fullRows(rows) {
-  var completeRows = [];
+  for (var i = start; i < start + range; i++) {
 
-  for (var row in rows) {
-    if (rows[row].length === 12) {
-      completeRows.push(row);
+    var colHeight = Math.max.apply(Math, _toConsumableArray(aiStillShapes[i]));
+    var difference = colHeight + 2 - (reference + 2);
+    layer.push(difference);
+  }
+
+  return layer;
+};
+
+// FIND MOVE THAT COMPLETES MOST ROWS
+
+var numberOfCompleteRows = function numberOfCompleteRows(potentialMove) {
+  var rows = 0;
+
+  for (var row in potentialMove) {
+    if (potentialMove[row].length === 12) {
+      rows += 1;
     }
   }
 
-  completeRows.length;
+  return rows;
 };
 
 /***/ }),

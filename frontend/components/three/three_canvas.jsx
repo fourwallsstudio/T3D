@@ -86,8 +86,8 @@ const ThreeCanvas = props => {
         break;
 
       case "p":
-        playAndPause();
-        aiPlay(aiMoves)
+        playAndPause()
+        aiPlay(...aiMoves)
         break;
 
       case "r":
@@ -105,12 +105,14 @@ const ThreeCanvas = props => {
 
   const toggleView = () => {
     if (viewRegular) {
+
       camera.position.z = 4;
       camera.position.y = -2;
       camera.lookAt( new THREE.Vector3(0.5,24,-5) );
       viewRegular = false;
       switchDisabled = true;
       props.disableGrid();
+
     } else {
 
       camera.position.z = 13;
@@ -128,39 +130,42 @@ const ThreeCanvas = props => {
   let shapeDeltas = Shape.deltas[shapeIndex % 7]
   let aiMoves = AI.generateMove(shapeDeltas, newRotateDeltas);
 
-  const aiPlay = (aiMoves) => {
-    let moveIndex = aiMoves[0]
-    let rotations = aiMoves[1]
 
-    for (let i = 0; i < rotations; i++) {
-      Game.rotateShape(newShape, newRotateDeltas, i)
-      shapeDeltaIndex += 1
-    }
+  const aiPlay = (moveIndex, rotations) => {
 
-    let furthestLeftIndex = findFurthestLeft(newShape);
+    aiRotate(rotations)
 
-    while (newShape[furthestLeftIndex].position.x !== moveIndex) {
-      if (moveIndex < newShape[furthestLeftIndex].position.x) {
-        Game.moveLeft(newShape)
-      } else {
-        Game.moveRight(newShape)
-      }
-    }
+    aiMakeMove(moveIndex)
+
     boost = .3;
   }
 
-  const findFurthestLeft = newShape => {
-    let mostLeftX = 0
-    let mostLeftIndex = 0
 
-    newShape.forEach( (cube, i) => {
-      if (cube.position.x < mostLeftX) {
-        mostLeftX = cube.position.x
-        mostLeftIndex = i
+  const aiRotate = rotations => {
+
+    for (let i = 0; i < rotations; i++) {
+
+      Game.rotateShape(newShape, newRotateDeltas, i)
+      shapeDeltaIndex += 1
+    }
+  }
+
+
+  const aiMakeMove = moveIndex => {
+
+    let furthestLeftIndex = AI.findFurthestLeft(newShape);
+
+    while (newShape[furthestLeftIndex].position.x !== moveIndex) {
+
+      if (moveIndex < newShape[furthestLeftIndex].position.x) {
+
+        Game.moveLeft(newShape)
+
+      } else {
+
+        Game.moveRight(newShape)
       }
-    })
-
-    return mostLeftIndex
+    }
   }
 
 
@@ -217,7 +222,7 @@ const ThreeCanvas = props => {
 
       shapeDeltas = Shape.deltas[shapeIndex % 7]
       aiMoves = AI.generateMove(shapeDeltas, newRotateDeltas);
-      aiPlay(aiMoves)
+      aiPlay(...aiMoves)
     }
 
 

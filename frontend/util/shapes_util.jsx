@@ -1,6 +1,6 @@
 var THREE = require('three');
 
-//SHAPES
+// SHAPES
 var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
 var material = new THREE.MeshPhongMaterial( {
