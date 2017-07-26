@@ -31,6 +31,27 @@ export const generateMove = (deltas, rotateDeltas) => {
   let layer = bottomSurfaceOfPiece(newDeltas)
   let moveToIndex = matchPieceToStillShapes(layer)
 
+  if (moveToIndex === null) {
+
+    for (rotations = 1; rotations <= rotateDeltas.length; rotations++) {
+
+      newDeltas = getDeltas(rotations, deltas, rotateDeltas)
+      layer = bottomSurfaceOfPiece(newDeltas)
+      moveToIndex = matchPieceToStillShapes(layer)
+
+      if (moveToIndex !== null) {
+        break
+      }
+    }
+  }
+
+  if (moveToIndex === null) {
+    rotations = narrowestSurface(deltas, rotateDeltas)
+    newDeltas = getDeltas(rotations, deltas, rotateDeltas)
+    layer = bottomSurfaceOfPiece(newDeltas)
+    moveToIndex = findLowestInRange(layer.length)
+  }
+
   return [moveToIndex, rotations]
 }
 
@@ -82,6 +103,26 @@ const flatnessMinReached = () => {
     return longestFlat > 4
 }
 
+const findLowestInRange = range => {
+  let lowestRange = null
+  let lowestRangeIndex = 0
+
+  for (let i = 0; i + range < aiStillShapes; i++) {
+    let currentRangeSum = 0
+
+    for (let j = 0; j < range; j++) {
+      currentRangeSum += Math.max(...aiStillShapes[i + j])
+    }
+
+    if (lowestRange === null || currentRangeSum < lowestRange) {
+      lowestRange = currentRangeSum
+      lowestRangeIndex = i
+    }
+  }
+
+  return -5 + lowestRangeIndex
+}
+
 
 
 // FIND WIDEST FLAT SURFACE BY ROTATION
@@ -116,11 +157,11 @@ const widestFlatSurface = (deltas, rotateDeltas) => {
       }
     }
 
-    let currentWidestSurface = values(currentSurface).length
+    let currentSurfaceLength = values(currentSurface).length
 
-    if (currentWidestSurface > widestFlatSurface) {
+    if (currentSurfaceLength > widestFlatSurface) {
 
-      widestFlatSurface = currentWidestSurface
+      widestFlatSurface = currentSurfaceLength
       widestRotation = rotations
     }
 
@@ -128,6 +169,51 @@ const widestFlatSurface = (deltas, rotateDeltas) => {
   }
 
   return widestRotation
+}
+
+
+const narrowestSurface = (deltas, rotateDeltas) => {
+
+  let currentDeltas = deltas.map( delta => {
+    return [delta[0], delta[1]]
+  })
+
+  let narrowest = null
+  let narrowestRotation = 0
+  let rotations = 0
+
+  for (let i = 0; i < rotateDeltas.length; i++) {
+
+    let currentSurface = {}
+    rotations += 1
+
+    for (let j = 0; j < rotateDeltas[i].length; j++) {
+
+      currentDeltas[j][0] += rotateDeltas[i][j][0]
+      currentDeltas[j][1] += rotateDeltas[i][j][1]
+
+      if (currentSurface[ currentDeltas[j][0] ]) {
+
+        currentSurface[ currentDeltas[j][0] ] += 1
+
+      } else {
+
+        currentSurface[ currentDeltas[j][0] ] = 1
+      }
+    }
+
+    let currentSurfaceLength = values(currentSurface).length
+
+    if (narrowest === null || currentSurfaceLength < narrowest) {
+
+      narrowest = currentSurfaceLength
+      narrowestRotation = rotations
+    }
+
+    currentSurface = {}
+  }
+
+  return narrowestRotation
 }
 
 
@@ -155,13 +241,13 @@ const getDeltas = (rotations, deltas, rotateDeltas) => {
 const bottomSurfaceOfPiece = deltas => {
 
   let layer = []
-  let currentX = null
+  let seenX = {}
 
   for (let i = 0; i < deltas.length; i ++) {
 
-    if (deltas[i][0] != currentX) {
+    if (!seenX[deltas[i][0]]) {
 
-      currentX = deltas[i][0]
+      seenX[deltas[i][0]] = true
       layer.push(deltas[i][1])
 
     } else if (deltas[i][1] < layer[layer.length -1]) {
@@ -171,8 +257,12 @@ const bottomSurfaceOfPiece = deltas => {
 
   }
 
+  if (layer.length === 1) { layer = [0] }
+
   if (layer[0] === -1) {
-    layer = layer.map( el => { return el === -1 ? 0 : 1 })
+    layer = layer.map( el => { return el + 1 })
+  } else if (layer[0] === 1) {
+    layer = layer.map( el => { return el - 1 })
   }
 
   return layer
@@ -185,40 +275,18 @@ const matchPieceToStillShapes = (layer) => {
 
   let lowestReference = null
   let lowestIndex = null
-  let lowestRange = null
-  let lowestRangeIndex = null
 
 
   for (let i = 0; i + layer.length - 1 < aiStillShapes.length; i++) {
 
     let aligned = false
-    let reference = null
-    let currentRange = 0
+    let topSurfaceResult, rangeLayer, reference;
 
-    for (let j = 0; j < layer.length; j++) {
+    topSurfaceResult = topSurfaceInRange(i, layer.length)
+    rangeLayer = topSurfaceResult[0]
+    reference = topSurfaceResult[1]
 
-      let colMaxHeight = Math.max(...aiStillShapes[i + j])
-      currentRange += colMaxHeight
-
-
-      if (j === 0) {
-
-        reference = colMaxHeight
-
-      } else {
-
-        if ( reference + layer[j] === colMaxHeight ) {
-          aligned = true
-
-        } else {
-
-          aligned = false
-          reference = null
-          break
-        }
-
-      }
-    }
+    aligned = isAligned(layer, rangeLayer)
 
     if (aligned) {
       if (lowestReference === null || reference < lowestReference) {
@@ -227,19 +295,9 @@ const matchPieceToStillShapes = (layer) => {
         lowestIndex = i
       }
     }
-
-    if (lowestRange === null || currentRange < lowestRange) {
-
-      lowestRange = currentRange
-      lowestRangeIndex = i
-    }
-
-    aligned = false
-    reference = null
-    currentRange = 0
   }
 
-  return lowestIndex === null ? -5 + lowestRangeIndex : -5 + lowestIndex
+  return lowestIndex === null ? null : -5 + lowestIndex
 }
 
 
@@ -255,7 +313,20 @@ const topSurfaceInRange = (start, range) => {
     layer.push( difference )
   }
 
-  return layer
+  return [layer, reference]
+}
+
+
+const isAligned = (layer, rangeLayer) => {
+  let aligned = true
+
+  if (layer.length !== rangeLayer.length) { return false }
+
+  layer.forEach( (el, i) => {
+    if (el !== rangeLayer[i]) { aligned = false }
+  })
+
+  return aligned
 }
 
 
