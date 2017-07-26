@@ -1,6 +1,8 @@
 var THREE = require('three');
 import * as Shape from './shapes_util';
 
+
+
 // VARIABLES
 
 export const allCubes = {
@@ -101,8 +103,9 @@ export const addStillShape = (stillShape, scene) => {
   stillShape.forEach(s => {
     s.position.y = Math.ceil(s.position.y);
     if (!stillShapes[s.position.x].includes(s.position.y)) {
-      allCubes[s.position.y].push( s );
-      stillShapes[s.position.x].push( s.position.y );
+      let yPosition = s.position.y === -0 ? 0 : s.position.y
+      allCubes[yPosition].push( s );
+      stillShapes[s.position.x].push( yPosition );
     } else {
       scene.remove( s )
     }

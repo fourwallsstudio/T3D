@@ -6,40 +6,38 @@ var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 var material = new THREE.MeshPhongMaterial( {
   color: 0x6efc7f,
   transparent: true,
-  // opacity: .8,
-  // specular: 0x111111,
-  // shininess: 100
  } );
+
 var material2 = new THREE.MeshPhongMaterial( {
   color: 0xfffe97,
-  transparent: true,
-  // opacity: .8
+  transparent: true
 } );
+
 var material3 = new THREE.MeshPhongMaterial( {
   color: 0x71cfff,
-  transparent: true,
-  // opacity: .8
+  transparent: true
 } );
+
 var material4 = new THREE.MeshPhongMaterial( {
   color: 0xd4d473,
-  transparent: true,
-  // opacity: .8
+  transparent: true
 } );
+
 var material5 = new THREE.MeshPhongMaterial( {
   color: 0xf57979,
-  transparent: true,
-  // opacity: .8
+  transparent: true
 } );
+
 var material6 = new THREE.MeshPhongMaterial( {
   color: 0xeca2fc,
-  transparent: true,
-  // opacity: .8
+  transparent: true
 } );
+
 var material7 = new THREE.MeshPhongMaterial( {
   color: 0xbbc6fa,
-  transparent: true,
-  // opacity: .8
+  transparent: true
 } );
+
 
 
 const createI = () => {
@@ -55,9 +53,10 @@ const iDeltas =[
 ]
 
 const iRotateDeltas =[
-  [[1, -1], [0, 0], [-1, -1], [-2, -2]],
-  [[-1, 1], [0, 0], [1, 1], [2, 2]]
+  [[1, 1], [0, 0], [-1, -1], [-2, -2]],
+  [[-1, -1], [0, 0], [1, 1], [2, 2]]
 ]
+
 
 const createJ = () => {
   let j1 = new THREE.Mesh( geometry, material2 );
@@ -106,7 +105,7 @@ const createO = () => {
 }
 
 const oDeltas =[
-  [0, 0], [1, 0], [0, -1], [1, -1]
+  [0, 0], [0, -1], [1, 0], [1, -1]
 ]
 
 const oRotateDeltas =[

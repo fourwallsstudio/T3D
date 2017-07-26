@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as Shape from '../../util/shapes_util';
 import * as Game from '../../util/game_util';
+import * as AI from '../../util/ai_util';
 import {
   updateScore,
   updateLevel,
@@ -51,7 +52,6 @@ const ThreeCanvas = props => {
   // NEW SHAPE
   let shapeIndex = 0;
   let newShape = Game.nextShape(shapeIndex);
-  // newShape.forEach( c => c.material.opacity = 0.5 )
   let newRotateDeltas = Shape.rotateDeltas[shapeIndex];
   scene.add(...newShape);
 
@@ -87,6 +87,7 @@ const ThreeCanvas = props => {
 
       case "p":
         playAndPause();
+        aiPlay(aiMoves)
         break;
 
       case "r":
@@ -123,6 +124,46 @@ const ThreeCanvas = props => {
   }
 
 
+  // AI
+  let shapeDeltas = Shape.deltas[shapeIndex % 7]
+  let aiMoves = AI.generateMove(shapeDeltas, newRotateDeltas);
+
+  const aiPlay = (aiMoves) => {
+    let moveIndex = aiMoves[0]
+    let rotations = aiMoves[1]
+
+    for (let i = 0; i < rotations; i++) {
+      Game.rotateShape(newShape, newRotateDeltas, i)
+      shapeDeltaIndex += 1
+    }
+
+    let furthestLeftIndex = findFurthestLeft(newShape);
+
+    while (newShape[furthestLeftIndex].position.x !== moveIndex) {
+      if (moveIndex < newShape[furthestLeftIndex].position.x) {
+        Game.moveLeft(newShape)
+      } else {
+        Game.moveRight(newShape)
+      }
+    }
+    boost = .3;
+  }
+
+  const findFurthestLeft = newShape => {
+    let mostLeftX = 0
+    let mostLeftIndex = 0
+
+    newShape.forEach( (cube, i) => {
+      if (cube.position.x < mostLeftX) {
+        mostLeftX = cube.position.x
+        mostLeftIndex = i
+      }
+    })
+
+    return mostLeftIndex
+  }
+
+
   // ANIMATION
   let isPaused = true;
   let aniFrame;
@@ -135,20 +176,20 @@ const ThreeCanvas = props => {
       playAndPause();
     }
 
-    if (!switchDisabled) {
-      if ( Game.levelStatus % 2 === 0 ) {
-        speed = 0;
-        switchAnimate();
-
-      } else if ( Game.levelStatus % 2 === 1
-        && Game.levelStatus > 1 ) {
-          speed = 0;
-          switchBackAnimate();
-
-        } else {
-          speed = Game.speed();
-        }
-    }
+    // if (!switchDisabled) {
+    //   if ( Game.levelStatus % 2 === 0 ) {
+    //     speed = 0;
+    //     switchAnimate();
+    //
+    //   } else if ( Game.levelStatus % 2 === 1
+    //     && Game.levelStatus > 1 ) {
+    //       speed = 0;
+    //       switchBackAnimate();
+    //
+    //     } else {
+    //       speed = Game.speed();
+    //     }
+    // }
 
     if (!newShape.some( c => Game.stillShapes[c.position.x]
       .includes(Math.ceil(c.position.y) - 1) )) {
@@ -173,6 +214,10 @@ const ThreeCanvas = props => {
       newRotateDeltas = Shape.rotateDeltas[shapeIndex % 7];
 
       scene.add( ...newShape );
+
+      shapeDeltas = Shape.deltas[shapeIndex % 7]
+      aiMoves = AI.generateMove(shapeDeltas, newRotateDeltas);
+      aiPlay(aiMoves)
     }
 
 
@@ -201,6 +246,7 @@ const ThreeCanvas = props => {
 
       props.updateScore(Game.score);
     }, 100);
+
   }
 
 
