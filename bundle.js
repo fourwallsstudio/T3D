@@ -90129,7 +90129,7 @@ var findFurthestLeft = exports.findFurthestLeft = function findFurthestLeft(newS
   return mostLeftIndex;
 };
 
-// CONTINUOUS FLATNESS OF BOARD IS > 4 ?
+// CONTINUOUS FLATNESS OF BOARD IS > 4 && TALLEST UNDER 5?
 
 var flatnessMinReached = function flatnessMinReached() {
 
@@ -90141,6 +90141,10 @@ var flatnessMinReached = function flatnessMinReached() {
 
   aiStillShapes.forEach(function (col) {
     var colMax = Math.max.apply(Math, _toConsumableArray(col));
+
+    if (colMax > 4) {
+      return false;
+    }
 
     if (currentY !== colMax) {
 
@@ -90167,14 +90171,17 @@ var findLowestInRange = function findLowestInRange(range) {
   var lowestRangeIndex = 0;
 
   for (var i = 0; i + range < aiStillShapes; i++) {
-    var currentRangeSum = 0;
+    var currentRangeMax = 0;
 
     for (var j = 0; j < range; j++) {
-      currentRangeSum += Math.max.apply(Math, _toConsumableArray(aiStillShapes[i + j]));
+      var colHeight = Math.max.apply(Math, _toConsumableArray(aiStillShapes[i + j]));
+      if (colHeight > currentRangeMax) {
+        currentRangeMax = colHeight;
+      }
     }
 
-    if (lowestRange === null || currentRangeSum < lowestRange) {
-      lowestRange = currentRangeSum;
+    if (lowestRange === null || currentRangeMax < lowestRange) {
+      lowestRange = currentRangeMax;
       lowestRangeIndex = i;
     }
   }

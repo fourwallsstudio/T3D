@@ -31,6 +31,7 @@ export const generateMove = (deltas, rotateDeltas) => {
   let layer = bottomSurfaceOfPiece(newDeltas)
   let moveToIndex = matchPieceToStillShapes(layer)
 
+
   if (moveToIndex === null) {
 
     for (rotations = 1; rotations <= rotateDeltas.length; rotations++) {
@@ -73,7 +74,7 @@ export const findFurthestLeft = newShape => {
 
 
 
-// CONTINUOUS FLATNESS OF BOARD IS > 4 ?
+// CONTINUOUS FLATNESS OF BOARD IS > 4 && TALLEST UNDER 5?
 
 const flatnessMinReached = () => {
 
@@ -85,6 +86,8 @@ const flatnessMinReached = () => {
 
     aiStillShapes.forEach( col => {
       let colMax = Math.max(...col)
+
+      if (colMax > 4) { return false }
 
       if (currentY !== colMax) {
 
@@ -103,19 +106,21 @@ const flatnessMinReached = () => {
     return longestFlat > 4
 }
 
+
 const findLowestInRange = range => {
   let lowestRange = null
   let lowestRangeIndex = 0
 
   for (let i = 0; i + range < aiStillShapes; i++) {
-    let currentRangeSum = 0
+    let currentRangeMax = 0
 
     for (let j = 0; j < range; j++) {
-      currentRangeSum += Math.max(...aiStillShapes[i + j])
+      let colHeight = Math.max(...aiStillShapes[i + j])
+      if (colHeight > currentRangeMax) { currentRangeMax = colHeight }
     }
 
-    if (lowestRange === null || currentRangeSum < lowestRange) {
-      lowestRange = currentRangeSum
+    if (lowestRange === null || currentRangeMax < lowestRange) {
+      lowestRange = currentRangeMax
       lowestRangeIndex = i
     }
   }
