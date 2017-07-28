@@ -17,7 +17,7 @@ const getAiStillShapes = () => {
 const aiRows = {}
 
 for (var y in Game.allCubes) {
-  aiRows[y] = Object.assign([], Game.allCubes[y])
+  aiRows[y] = [ ...Game.allCubes[y] ]
 }
 
 
@@ -69,7 +69,6 @@ export const generateMove = (deltas, rotateDeltas) => {
 const getScore = (start, layer, newDeltas) => {
 
   let score = 0
-
   let fitDeltas = getFitDeltas(start, layer, newDeltas)
 
   score += numberOfCompleteRows(start, fitDeltas)
@@ -95,7 +94,9 @@ const getFitDeltas = (start, layer, deltas) => {
 
     for (let j = start; j < start + layer.length; j++) {
       if(j !== i) {
-        if (currentHeightRef + layer[j - start] + offset <= Math.max(...aiStillShapes[j])) {
+        let colHeight = currentHeightRef + layer[j - start] + offset
+
+        if (colHeight <= Math.max(...aiStillShapes[j])) {
           valid = false
         }
       }
@@ -157,7 +158,7 @@ const getFitScore = (start, layer, fitDeltas) => {
     totalGaps += gaps
   }
 
-  let heightScore = 24 - (heightMax + 2)
+  let heightScore = (24 - (heightMax + 2)) * 2
 
   return heightScore - totalGaps + layer.length
 }
@@ -268,7 +269,7 @@ const numberOfCompleteRows = (start, newDeltas) => {
   let potentialMove = {}
 
   for (var y in Game.allCubes) {
-    potentialMove[y] = Object.assign([], Game.allCubes[y])
+    potentialMove[y] = [ ...Game.allCubes[y] ]
   }
 
   newDeltas.forEach( delta => {

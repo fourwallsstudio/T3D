@@ -6,13 +6,11 @@ import * as Shape from './shapes_util';
 // VARIABLES
 
 export const allCubes = {
-  '0': [], '1': [], '2': [], '3': [],
-  '4': [], '5': [], '6': [], '7': [],
-  '8': [], '9': [], '10': [], '11': [],
-  '12': [], '13': [], '14': [], '15': [],
-  '16': [], '17': [], '18': [], '19': [],
-  '20': [], '21': [], '22': [], '23': [],
-  '24': []
+  '0': [], '1': [], '2': [], '3': [], '4': [],
+  '5': [], '6': [], '7': [], '8': [], '9': [],
+  '10': [], '11': [], '12': [], '13': [], '14': [],
+  '15': [], '16': [], '17': [], '18': [], '19': [],
+  '20': [], '21': [], '22': [], '23': [], '24': [],
 }
 
 export const stillShapes = {
@@ -27,7 +25,7 @@ export const stillShapes = {
   '3': [-1],
   '4': [-1],
   '5': [-1],
-  '6': [-1]
+  '6': [-1],
 }
 
 let totalShapes = 0;
@@ -102,11 +100,15 @@ const addScore = rowAmount => {
 export const addStillShape = (stillShape, scene) => {
   stillShape.forEach(s => {
     s.position.y = Math.ceil(s.position.y);
+
     if (!stillShapes[s.position.x].includes(s.position.y)) {
+
       let yPosition = s.position.y === -0 ? 0 : s.position.y
       allCubes[yPosition].push( s );
       stillShapes[s.position.x].push( yPosition );
+
     } else {
+
       scene.remove( s )
     }
   })
@@ -118,34 +120,35 @@ export const moveCubes = (newShape, speed, boost) => {
 
 
 export const moveLeft = shape => {
-  if (!shape.some( c => {
-    return stillShapes[c.position.x - 1] &&
-    stillShapes[c.position.x - 1]
-      .includes(Math.floor(c.position.y))
-    }) &&
-    shape.every( c => c.position.x > -5) ) {
-
+  if (moveValid(shape, 'left')) {
     shape.forEach( c => c.position.x -= 1);
   }
 }
 
 export const moveRight = shape => {
-  if (!shape.some( c => {
-    return stillShapes[c.position.x + 1] &&
-    stillShapes[c.position.x + 1]
-      .includes(Math.floor(c.position.y))
-  }) &&
-    shape.every( c => c.position.x < 6) ) {
-
+  if (moveValid(shape, 'right')) {
     shape.forEach( c => c.position.x += 1);
   }
 }
 
+const moveValid = (shape, direction) => {
+  const step = direction === 'left' ? -1 : 1
+  const inBounds = direction === 'left' ?
+    shape.every( c => c.position.x > -5) :
+    shape.every( c => c.position.x < 6 )
+
+  return (
+    !shape.some( c => stillShapes[c.position.x + step] &&
+    stillShapes[c.position.x + step]
+      .includes(Math.floor(c.position.y))) && inBounds
+  )
+}
+
 export const rotateShape = (newShape, newRotateDeltas, shapeDeltaIndex) => {
-  let newD = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length]
+  let newDeltas = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length]
 
     for (let i = 0; i < newShape.length; i++) {
-      let d = newD[i];
+      let d = newDeltas[i];
       newShape[i].position.x += d[0];
       newShape[i].position.y += d[1];
     }
@@ -153,11 +156,11 @@ export const rotateShape = (newShape, newRotateDeltas, shapeDeltaIndex) => {
 }
 
 export const rotatable = (newShape, newRotateDeltas, shapeDeltaIndex) => {
-  let newD = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length]
+  let newDeltas = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length]
   let newXPosition = [];
 
   for (let i = 0; i < newShape.length; i++) {
-    let d = newD[i];
+    let d = newDeltas[i];
     let newX = newShape[i].position.x + d[0];
 
     if (newX > 6 || newX < -5) {
@@ -167,13 +170,14 @@ export const rotatable = (newShape, newRotateDeltas, shapeDeltaIndex) => {
         .includes(Math.ceil(newShape[i].position.y + d[1]) - 1)) {
 
           return false
-        }
+    }
   }
 
     return true;
 }
 
 export const nextShape = idx => {
+
   let newShape = Shape.shapes[idx % 7]();
   let newDeltas = Shape.deltas[idx % 7];
 
@@ -213,7 +217,9 @@ export const fullRow = (scene) => {
 
 
 const removeRows = (allCubes, rows, scene) => {
+
   return new Promise((resolve, reject) => {
+
     rows.forEach( row => {
       allCubes[row].forEach( c => scene.remove( c ) );
       allCubes[row] = [];
@@ -225,6 +231,7 @@ const removeRows = (allCubes, rows, scene) => {
 
 
 const reassembleCubes = rows => {
+
   return new Promise((resolve, reject) => {
     rows = rows();
 
@@ -232,6 +239,7 @@ const reassembleCubes = rows => {
 
       for (let i = 0; i < 23; i++) {
         let j = i + 1;
+
         if (allCubes[i].length === 0) {
           allCubes[i] = allCubes[j];
           allCubes[i].forEach( c => c.position.y -= 1 )

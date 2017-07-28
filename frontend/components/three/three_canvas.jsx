@@ -14,14 +14,24 @@ var THREE = require('three');
 const ThreeCanvas = props => {
 
   var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 0.1, 100 );
+  var camera = new THREE.PerspectiveCamera(
+    100,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100,
+  );
   camera.position.z = 13;
   camera.position.y = 12;
   camera.position.x = 0.5;
   camera.lookAt( new THREE.Vector3(0.5,12,0) );
 
 
-  var renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("myCanvas"), alpha: true });
+  var renderer = new THREE.WebGLRenderer(
+    {
+      canvas: document.getElementById("myCanvas"),
+      alpha: true,
+    }
+  );
   renderer.setSize( window.innerWidth, window.innerHeight );
 
 
@@ -40,7 +50,12 @@ const ThreeCanvas = props => {
 
   // BORDER
   var geometryB = new THREE.PlaneGeometry(0.1, 25);
-  var materialB = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
+  var materialB = new THREE.MeshBasicMaterial(
+    {
+      color: 0xffffff,
+      side: THREE.DoubleSide
+    }
+  );
   var border1 = new THREE.Mesh( geometryB, materialB );
   var border2 = new THREE.Mesh( geometryB, materialB );
   border1.position.set(-6, 12, 0);
@@ -205,7 +220,7 @@ const ThreeCanvas = props => {
 
       shapeDeltaIndex = 0;
       boost = 0;
-      shapeIndex += 1;
+      shapeIndex += 1 ;
 
       Game.addStillShape(newShape, scene);
 
@@ -257,10 +272,13 @@ const ThreeCanvas = props => {
 
   const playAndPause = () => {
     if (isPaused) {
+
       animate();
       isPaused = !isPaused;
       props.updateGameStatus('playing');
+
     } else {
+
       cancelAnimationFrame( aniFrame );
       isPaused = !isPaused;
       props.updateGameStatus('paused');
@@ -272,31 +290,39 @@ const ThreeCanvas = props => {
 
   const switchAnimate = () => {
     if (Math.sin(cameraDelta) >= 0) {
+
       cameraDelta += 0.05;
       camera.lookAt( new THREE.Vector3(0.5,12,0) );
       camera.position.y = 12;
       camera.position.x = Math.sin(cameraDelta) * 13;
       camera.position.z = Math.cos(cameraDelta) * 13;
+
     } else {
+
       camera.lookAt( new THREE.Vector3(0.5,12,0) );
       camera.position.set(0.5, 12, -13);
       speed = Game.speed();
     }
+
     props.updateLevel(Game.levelStatus);
   }
 
   const switchBackAnimate = () => {
     if (Math.sin(cameraDelta) <= 0) {
+
       cameraDelta += 0.05;
       camera.lookAt( new THREE.Vector3(-0.5,12,0) );
       camera.position.y = 12;
       camera.position.x = Math.sin(cameraDelta) * 13;
       camera.position.z = Math.cos(cameraDelta) * 13;
+
     } else {
+
       camera.lookAt( new THREE.Vector3(0.5,12,0) );
       camera.position.set(0.5, 12, 13);
       speed = Game.speed();
     }
+
     props.updateLevel(Game.levelStatus);
   }
 

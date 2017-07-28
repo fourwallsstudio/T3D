@@ -55582,13 +55582,11 @@ var THREE = __webpack_require__(35);
 // VARIABLES
 
 var allCubes = exports.allCubes = {
-  '0': [], '1': [], '2': [], '3': [],
-  '4': [], '5': [], '6': [], '7': [],
-  '8': [], '9': [], '10': [], '11': [],
-  '12': [], '13': [], '14': [], '15': [],
-  '16': [], '17': [], '18': [], '19': [],
-  '20': [], '21': [], '22': [], '23': [],
-  '24': []
+  '0': [], '1': [], '2': [], '3': [], '4': [],
+  '5': [], '6': [], '7': [], '8': [], '9': [],
+  '10': [], '11': [], '12': [], '13': [], '14': [],
+  '15': [], '16': [], '17': [], '18': [], '19': [],
+  '20': [], '21': [], '22': [], '23': [], '24': []
 };
 
 var stillShapes = exports.stillShapes = {
@@ -55675,11 +55673,14 @@ var addScore = function addScore(rowAmount) {
 var addStillShape = exports.addStillShape = function addStillShape(stillShape, scene) {
   stillShape.forEach(function (s) {
     s.position.y = Math.ceil(s.position.y);
+
     if (!stillShapes[s.position.x].includes(s.position.y)) {
+
       var yPosition = s.position.y === -0 ? 0 : s.position.y;
       allCubes[yPosition].push(s);
       stillShapes[s.position.x].push(yPosition);
     } else {
+
       scene.remove(s);
     }
   });
@@ -55692,12 +55693,7 @@ var moveCubes = exports.moveCubes = function moveCubes(newShape, speed, boost) {
 };
 
 var moveLeft = exports.moveLeft = function moveLeft(shape) {
-  if (!shape.some(function (c) {
-    return stillShapes[c.position.x - 1] && stillShapes[c.position.x - 1].includes(Math.floor(c.position.y));
-  }) && shape.every(function (c) {
-    return c.position.x > -5;
-  })) {
-
+  if (moveValid(shape, 'left')) {
     shape.forEach(function (c) {
       return c.position.x -= 1;
     });
@@ -55705,34 +55701,42 @@ var moveLeft = exports.moveLeft = function moveLeft(shape) {
 };
 
 var moveRight = exports.moveRight = function moveRight(shape) {
-  if (!shape.some(function (c) {
-    return stillShapes[c.position.x + 1] && stillShapes[c.position.x + 1].includes(Math.floor(c.position.y));
-  }) && shape.every(function (c) {
-    return c.position.x < 6;
-  })) {
-
+  if (moveValid(shape, 'right')) {
     shape.forEach(function (c) {
       return c.position.x += 1;
     });
   }
 };
 
+var moveValid = function moveValid(shape, direction) {
+  var step = direction === 'left' ? -1 : 1;
+  var inBounds = direction === 'left' ? shape.every(function (c) {
+    return c.position.x > -5;
+  }) : shape.every(function (c) {
+    return c.position.x < 6;
+  });
+
+  return !shape.some(function (c) {
+    return stillShapes[c.position.x + step] && stillShapes[c.position.x + step].includes(Math.floor(c.position.y));
+  }) && inBounds;
+};
+
 var rotateShape = exports.rotateShape = function rotateShape(newShape, newRotateDeltas, shapeDeltaIndex) {
-  var newD = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length];
+  var newDeltas = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length];
 
   for (var i = 0; i < newShape.length; i++) {
-    var d = newD[i];
+    var d = newDeltas[i];
     newShape[i].position.x += d[0];
     newShape[i].position.y += d[1];
   }
 };
 
 var rotatable = exports.rotatable = function rotatable(newShape, newRotateDeltas, shapeDeltaIndex) {
-  var newD = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length];
+  var newDeltas = newRotateDeltas[shapeDeltaIndex % newRotateDeltas.length];
   var newXPosition = [];
 
   for (var i = 0; i < newShape.length; i++) {
-    var d = newD[i];
+    var d = newDeltas[i];
     var newX = newShape[i].position.x + d[0];
 
     if (newX > 6 || newX < -5) {
@@ -55747,6 +55751,7 @@ var rotatable = exports.rotatable = function rotatable(newShape, newRotateDeltas
 };
 
 var nextShape = exports.nextShape = function nextShape(idx) {
+
   var newShape = Shape.shapes[idx % 7]();
   var newDeltas = Shape.deltas[idx % 7];
 
@@ -55785,7 +55790,9 @@ var fullRow = exports.fullRow = function fullRow(scene) {
 };
 
 var removeRows = function removeRows(allCubes, rows, scene) {
+
   return new Promise(function (resolve, reject) {
+
     rows.forEach(function (row) {
       allCubes[row].forEach(function (c) {
         return scene.remove(c);
@@ -55800,6 +55807,7 @@ var removeRows = function removeRows(allCubes, rows, scene) {
 };
 
 var reassembleCubes = function reassembleCubes(rows) {
+
   return new Promise(function (resolve, reject) {
     rows = rows();
 
@@ -55807,6 +55815,7 @@ var reassembleCubes = function reassembleCubes(rows) {
 
       for (var i = 0; i < 23; i++) {
         var j = i + 1;
+
         if (allCubes[i].length === 0) {
           allCubes[i] = allCubes[j];
           allCubes[i].forEach(function (c) {
@@ -89744,7 +89753,10 @@ var ThreeCanvas = function ThreeCanvas(props) {
   camera.position.x = 0.5;
   camera.lookAt(new THREE.Vector3(0.5, 12, 0));
 
-  var renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("myCanvas"), alpha: true });
+  var renderer = new THREE.WebGLRenderer({
+    canvas: document.getElementById("myCanvas"),
+    alpha: true
+  });
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   // LIGHT
@@ -89761,7 +89773,10 @@ var ThreeCanvas = function ThreeCanvas(props) {
 
   // BORDER
   var geometryB = new THREE.PlaneGeometry(0.1, 25);
-  var materialB = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+  var materialB = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide
+  });
   var border1 = new THREE.Mesh(geometryB, materialB);
   var border2 = new THREE.Mesh(geometryB, materialB);
   border1.position.set(-6, 12, 0);
@@ -89964,10 +89979,12 @@ var ThreeCanvas = function ThreeCanvas(props) {
 
   var playAndPause = function playAndPause() {
     if (isPaused) {
+
       animate();
       isPaused = !isPaused;
       props.updateGameStatus('playing');
     } else {
+
       cancelAnimationFrame(aniFrame);
       isPaused = !isPaused;
       props.updateGameStatus('paused');
@@ -89978,31 +89995,37 @@ var ThreeCanvas = function ThreeCanvas(props) {
 
   var switchAnimate = function switchAnimate() {
     if (Math.sin(cameraDelta) >= 0) {
+
       cameraDelta += 0.05;
       camera.lookAt(new THREE.Vector3(0.5, 12, 0));
       camera.position.y = 12;
       camera.position.x = Math.sin(cameraDelta) * 13;
       camera.position.z = Math.cos(cameraDelta) * 13;
     } else {
+
       camera.lookAt(new THREE.Vector3(0.5, 12, 0));
       camera.position.set(0.5, 12, -13);
       speed = Game.speed();
     }
+
     props.updateLevel(Game.levelStatus);
   };
 
   var switchBackAnimate = function switchBackAnimate() {
     if (Math.sin(cameraDelta) <= 0) {
+
       cameraDelta += 0.05;
       camera.lookAt(new THREE.Vector3(-0.5, 12, 0));
       camera.position.y = 12;
       camera.position.x = Math.sin(cameraDelta) * 13;
       camera.position.z = Math.cos(cameraDelta) * 13;
     } else {
+
       camera.lookAt(new THREE.Vector3(0.5, 12, 0));
       camera.position.set(0.5, 12, 13);
       speed = Game.speed();
     }
+
     props.updateLevel(Game.levelStatus);
   };
 
@@ -90077,7 +90100,7 @@ var getAiStillShapes = function getAiStillShapes() {
 var aiRows = {};
 
 for (var y in Game.allCubes) {
-  aiRows[y] = Object.assign([], Game.allCubes[y]);
+  aiRows[y] = [].concat(_toConsumableArray(Game.allCubes[y]));
 }
 
 // GENERATE MOVE
@@ -90129,7 +90152,6 @@ var generateMove = exports.generateMove = function generateMove(deltas, rotateDe
 var getScore = function getScore(start, layer, newDeltas) {
 
   var score = 0;
-
   var fitDeltas = getFitDeltas(start, layer, newDeltas);
 
   score += numberOfCompleteRows(start, fitDeltas);
@@ -90154,7 +90176,9 @@ var getFitDeltas = function getFitDeltas(start, layer, deltas) {
 
     for (var j = start; j < start + layer.length; j++) {
       if (j !== i) {
-        if (currentHeightRef + layer[j - start] + offset <= Math.max.apply(Math, _toConsumableArray(aiStillShapes[j]))) {
+        var colHeight = currentHeightRef + layer[j - start] + offset;
+
+        if (colHeight <= Math.max.apply(Math, _toConsumableArray(aiStillShapes[j]))) {
           valid = false;
         }
       }
@@ -90215,7 +90239,7 @@ var getFitScore = function getFitScore(start, layer, fitDeltas) {
     totalGaps += gaps;
   }
 
-  var heightScore = 24 - (heightMax + 2);
+  var heightScore = (24 - (heightMax + 2)) * 2;
 
   return heightScore - totalGaps + layer.length;
 };
@@ -90328,7 +90352,7 @@ var numberOfCompleteRows = function numberOfCompleteRows(start, newDeltas) {
   var potentialMove = {};
 
   for (var y in Game.allCubes) {
-    potentialMove[y] = Object.assign([], Game.allCubes[y]);
+    potentialMove[y] = [].concat(_toConsumableArray(Game.allCubes[y]));
   }
 
   newDeltas.forEach(function (delta) {
