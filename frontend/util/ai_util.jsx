@@ -14,46 +14,152 @@ const getAiStillShapes = () => {
   }
 }
 
-const aiRows = Game.allCubes
+const aiRows = {}
+
+for (var y in Game.allCubes) {
+  aiRows[y] = Object.assign([], Game.allCubes[y])
+}
 
 
 // GENERATE MOVE
 export const generateMove = (deltas, rotateDeltas) => {
 
-  let newDeltas = deltas
-  let rotations = 0
+  let highestScore = 0
+  let bestRotations = 0
+  let moveToIndex = null
+  let newDeltas, layer, rotations;
 
-  if (flatnessMinReached()) {
-    rotations = widestFlatSurface(deltas, rotateDeltas)
-    newDeltas = getDeltas(rotations, deltas, rotateDeltas)
-  }
+  getAiStillShapes()
 
-  let layer = bottomSurfaceOfPiece(newDeltas)
-  let moveToIndex = matchPieceToStillShapes(layer)
+  newDeltas = deltas.map( delta => {
+    return [delta[0], delta[1]]
+  })
 
+  for (rotations = 0; rotations < rotateDeltas.length; rotations++) {
 
-  if (moveToIndex === null) {
-
-    for (rotations = 1; rotations <= rotateDeltas.length; rotations++) {
-
+    if (rotations > 0) {
       newDeltas = getDeltas(rotations, deltas, rotateDeltas)
-      layer = bottomSurfaceOfPiece(newDeltas)
-      moveToIndex = matchPieceToStillShapes(layer)
+    }
 
-      if (moveToIndex !== null) {
-        break
-      }
+    layer = bottomSurfaceOfPiece(newDeltas)
+
+    for (let start = 0; start + layer.length - 1 < aiStillShapes.length; start++) {
+
+        let deltasAtStart = moveDeltasToStart(start, newDeltas)
+
+        let currentScore = getScore(start, layer, deltasAtStart)
+
+        if (currentScore > highestScore) {
+
+          highestScore = currentScore
+          bestRotations = rotations
+          moveToIndex = start -5
+        }
     }
   }
 
-  if (moveToIndex === null) {
-    rotations = narrowestSurface(deltas, rotateDeltas)
-    newDeltas = getDeltas(rotations, deltas, rotateDeltas)
-    layer = bottomSurfaceOfPiece(newDeltas)
-    moveToIndex = findLowestInRange(layer.length)
+  // console.log("Game stillShapes", Game.stillShapes)
+  // console.log("aiStillShapes", aiStillShapes)
+  // console.log("moveToIndex", moveToIndex, "bestRotations", bestRotations, "highestScore", highestScore)
+  return [moveToIndex, bestRotations]
+}
+
+
+// GET SCORE
+const getScore = (start, layer, newDeltas) => {
+
+  let score = 0
+
+  let fitDeltas = getFitDeltas(start, layer, newDeltas)
+
+  score += numberOfCompleteRows(start, fitDeltas)
+  score += getFitScore(start, layer, fitDeltas)
+
+  return score
+}
+
+
+// GET FIT DELTAS
+
+const getFitDeltas = (start, layer, deltas) => {
+
+  let validHeight = 0
+  let refOffset = 0
+  let refIndex = 0
+
+  for (let i = start; i < start + layer.length; i++) {
+
+    let currentHeightRef = Math.max(...aiStillShapes[i]) + 1
+    let offset = layer[i - start] * -1
+    let valid = true
+
+    for (let j = start; j < start + layer.length; j++) {
+      if(j !== i) {
+        if (currentHeightRef + layer[j - start] + offset <= Math.max(...aiStillShapes[j])) {
+          valid = false
+        }
+      }
+    }
+
+    if (valid) {
+      validHeight = currentHeightRef
+      refOffset = offset
+      refIndex = i
+      break;
+    }
   }
 
-  return [moveToIndex, rotations]
+  let newDeltas = deltas.map( delta => {
+    return [delta[0], delta[1]]
+  })
+
+  newDeltas.forEach( delta => {
+    if (delta[1] === refIndex) {
+      delta[1] += validHeight
+    } else {
+      delta[1] += validHeight + refOffset
+    }
+  })
+
+  return newDeltas
+}
+
+
+
+// GET FIT SCORE
+const getFitScore = (start, layer, fitDeltas) => {
+
+  let totalGaps = 0
+  let heightMax = 0
+
+  let fitColumns = {}
+
+  fitDeltas.forEach( delta => {
+
+    if (fitColumns[delta[0]]) {
+
+      if (delta[1] < fitColumns[delta[0]]) {
+        fitColumns[delta[0]] = delta[1]
+      }
+
+    } else {
+
+      fitColumns[delta[0]] = delta[1]
+    }
+  })
+
+  for (let i = start; i < start + layer.length; i++) {
+
+    let colHeight = fitColumns[i]
+    let gaps = colHeight - (aiStillShapes[i].length - 1)
+
+    if (colHeight > heightMax) { heightMax = colHeight }
+    totalGaps += gaps
+  }
+
+  let heightScore = 24 - (heightMax + 2)
+
+  return heightScore - totalGaps + layer.length
 }
 
 
@@ -72,154 +178,6 @@ export const findFurthestLeft = newShape => {
   return mostLeftIndex
 }
 
-
-
-// CONTINUOUS FLATNESS OF BOARD IS > 4 && TALLEST UNDER 5?
-
-const flatnessMinReached = () => {
-
-    getAiStillShapes()
-
-    let longestFlat = 0
-    let currentY = 0
-    let currentFlat = 0
-
-    aiStillShapes.forEach( col => {
-      let colMax = Math.max(...col)
-
-      if (colMax > 4) { return false }
-
-      if (currentY !== colMax) {
-
-        if (currentFlat > longestFlat) { longestFlat = currentFlat }
-        currentY = colMax
-        currentFlat = 1
-
-      } else {
-
-        currentFlat += 1
-      }
-    })
-
-    if (currentFlat > longestFlat) { longestFlat = currentFlat }
-
-    return longestFlat > 4
-}
-
-
-const findLowestInRange = range => {
-  let lowestRange = null
-  let lowestRangeIndex = 0
-
-  for (let i = 0; i + range < aiStillShapes; i++) {
-    let currentRangeMax = 0
-
-    for (let j = 0; j < range; j++) {
-      let colHeight = Math.max(...aiStillShapes[i + j])
-      if (colHeight > currentRangeMax) { currentRangeMax = colHeight }
-    }
-
-    if (lowestRange === null || currentRangeMax < lowestRange) {
-      lowestRange = currentRangeMax
-      lowestRangeIndex = i
-    }
-  }
-
-  return -5 + lowestRangeIndex
-}
-
-
-
-// FIND WIDEST FLAT SURFACE BY ROTATION
-
-const widestFlatSurface = (deltas, rotateDeltas) => {
-
-  let currentDeltas = deltas.map( delta => {
-    return [delta[0], delta[1]]
-  })
-
-  let widestFlatSurface = 0
-  let widestRotation = 0
-  let rotations = 0
-
-  for (let i = 0; i < rotateDeltas.length; i++) {
-
-    let currentSurface = {}
-    rotations += 1
-
-    for (let j = 0; j < rotateDeltas[i].length; j++) {
-
-      currentDeltas[j][0] += rotateDeltas[i][j][0]
-      currentDeltas[j][1] += rotateDeltas[i][j][1]
-
-      if (currentSurface[ currentDeltas[j][0] ]) {
-
-        currentSurface[ currentDeltas[j][0] ] += 1
-
-      } else {
-
-        currentSurface[ currentDeltas[j][0] ] = 1
-      }
-    }
-
-    let currentSurfaceLength = values(currentSurface).length
-
-    if (currentSurfaceLength > widestFlatSurface) {
-
-      widestFlatSurface = currentSurfaceLength
-      widestRotation = rotations
-    }
-
-    currentSurface = {}
-  }
-
-  return widestRotation
-}
-
-
-const narrowestSurface = (deltas, rotateDeltas) => {
-
-  let currentDeltas = deltas.map( delta => {
-    return [delta[0], delta[1]]
-  })
-
-  let narrowest = null
-  let narrowestRotation = 0
-  let rotations = 0
-
-  for (let i = 0; i < rotateDeltas.length; i++) {
-
-    let currentSurface = {}
-    rotations += 1
-
-    for (let j = 0; j < rotateDeltas[i].length; j++) {
-
-      currentDeltas[j][0] += rotateDeltas[i][j][0]
-      currentDeltas[j][1] += rotateDeltas[i][j][1]
-
-      if (currentSurface[ currentDeltas[j][0] ]) {
-
-        currentSurface[ currentDeltas[j][0] ] += 1
-
-      } else {
-
-        currentSurface[ currentDeltas[j][0] ] = 1
-      }
-    }
-
-    let currentSurfaceLength = values(currentSurface).length
-
-    if (narrowest === null || currentSurfaceLength < narrowest) {
-
-      narrowest = currentSurfaceLength
-      narrowestRotation = rotations
-    }
-
-    currentSurface = {}
-  }
-
-  return narrowestRotation
-}
 
 
 const getDeltas = (rotations, deltas, rotateDeltas) => {
@@ -241,6 +199,29 @@ const getDeltas = (rotations, deltas, rotateDeltas) => {
 }
 
 
+const moveDeltasToStart = (start, deltas) => {
+
+  let newDeltas = deltas.map( delta => {
+    return [delta[0], delta[1]]
+  })
+
+  let furthestLeft = 0
+  let furthestDown = 0
+
+  newDeltas.forEach( delta => {
+    if (delta[0] < furthestLeft) { furthestLeft = delta[0] }
+    if (delta[1] < furthestDown) { furthestDown = delta[1] }
+  })
+
+  newDeltas.forEach( delta => {
+    delta[0] = delta[0] + Math.abs(furthestLeft) + start
+    delta[1] = delta[1] + Math.abs(furthestDown)
+  })
+
+  return newDeltas
+}
+
+
 // MATCH PIECE SHAPE TO STILL SHAPES
 
 const bottomSurfaceOfPiece = deltas => {
@@ -259,86 +240,41 @@ const bottomSurfaceOfPiece = deltas => {
 
       layer[layer.length -1] = deltas[i][1]
     }
-
   }
+
 
   if (layer.length === 1) { layer = [0] }
 
-  if (layer[0] === -1) {
-    layer = layer.map( el => { return el + 1 })
-  } else if (layer[0] === 1) {
-    layer = layer.map( el => { return el - 1 })
+
+  if (layer.some( el => el === -1 ) ) {
+
+    layer = layer.map( el => el + 1 )
+
+  } else if (layer.some( el => el === -2 ) ) {
+
+    layer = layer.map( el => el + 2 )
   }
 
   return layer
 }
 
 
-const matchPieceToStillShapes = (layer) => {
-
-  getAiStillShapes()
-
-  let lowestReference = null
-  let lowestIndex = null
-
-
-  for (let i = 0; i + layer.length - 1 < aiStillShapes.length; i++) {
-
-    let aligned = false
-    let topSurfaceResult, rangeLayer, reference;
-
-    topSurfaceResult = topSurfaceInRange(i, layer.length)
-    rangeLayer = topSurfaceResult[0]
-    reference = topSurfaceResult[1]
-
-    aligned = isAligned(layer, rangeLayer)
-
-    if (aligned) {
-      if (lowestReference === null || reference < lowestReference) {
-
-        lowestReference = reference
-        lowestIndex = i
-      }
-    }
-  }
-
-  return lowestIndex === null ? null : -5 + lowestIndex
-}
-
-
-const topSurfaceInRange = (start, range) => {
-
-  let layer = []
-  let reference = Math.max(...aiStillShapes[start])
-
-  for (let i = start; i < start + range; i++) {
-
-    let colHeight = Math.max(...aiStillShapes[i])
-    let difference = (colHeight + 2) - (reference + 2)
-    layer.push( difference )
-  }
-
-  return [layer, reference]
-}
-
-
-const isAligned = (layer, rangeLayer) => {
-  let aligned = true
-
-  if (layer.length !== rangeLayer.length) { return false }
-
-  layer.forEach( (el, i) => {
-    if (el !== rangeLayer[i]) { aligned = false }
-  })
-
-  return aligned
-}
-
 
 
 // FIND MOVE THAT COMPLETES MOST ROWS
 
-const numberOfCompleteRows = potentialMove => {
+const numberOfCompleteRows = (start, newDeltas) => {
+
+  let potentialMove = {}
+
+  for (var y in Game.allCubes) {
+    potentialMove[y] = Object.assign([], Game.allCubes[y])
+  }
+
+  newDeltas.forEach( delta => {
+    potentialMove[delta[1]].push(delta[0])
+  })
+
   let rows = 0
 
   for (var row in potentialMove) {
@@ -347,5 +283,5 @@ const numberOfCompleteRows = potentialMove => {
     }
   }
 
-  return rows
+  return rows * 100
 }

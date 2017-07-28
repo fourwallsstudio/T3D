@@ -90074,44 +90074,150 @@ var getAiStillShapes = function getAiStillShapes() {
   }
 };
 
-var aiRows = Game.allCubes;
+var aiRows = {};
+
+for (var y in Game.allCubes) {
+  aiRows[y] = Object.assign([], Game.allCubes[y]);
+}
 
 // GENERATE MOVE
 var generateMove = exports.generateMove = function generateMove(deltas, rotateDeltas) {
 
-  var newDeltas = deltas;
-  var rotations = 0;
+  var highestScore = 0;
+  var bestRotations = 0;
+  var moveToIndex = null;
+  var newDeltas = void 0,
+      layer = void 0,
+      rotations = void 0;
 
-  if (flatnessMinReached()) {
-    rotations = widestFlatSurface(deltas, rotateDeltas);
-    newDeltas = getDeltas(rotations, deltas, rotateDeltas);
-  }
+  getAiStillShapes();
 
-  var layer = bottomSurfaceOfPiece(newDeltas);
-  var moveToIndex = matchPieceToStillShapes(layer);
+  newDeltas = deltas.map(function (delta) {
+    return [delta[0], delta[1]];
+  });
 
-  if (moveToIndex === null) {
+  for (rotations = 0; rotations < rotateDeltas.length; rotations++) {
 
-    for (rotations = 1; rotations <= rotateDeltas.length; rotations++) {
-
+    if (rotations > 0) {
       newDeltas = getDeltas(rotations, deltas, rotateDeltas);
-      layer = bottomSurfaceOfPiece(newDeltas);
-      moveToIndex = matchPieceToStillShapes(layer);
+    }
 
-      if (moveToIndex !== null) {
-        break;
+    layer = bottomSurfaceOfPiece(newDeltas);
+
+    for (var start = 0; start + layer.length - 1 < aiStillShapes.length; start++) {
+
+      var deltasAtStart = moveDeltasToStart(start, newDeltas);
+
+      var currentScore = getScore(start, layer, deltasAtStart);
+
+      if (currentScore > highestScore) {
+
+        highestScore = currentScore;
+        bestRotations = rotations;
+        moveToIndex = start - 5;
       }
     }
   }
 
-  if (moveToIndex === null) {
-    rotations = narrowestSurface(deltas, rotateDeltas);
-    newDeltas = getDeltas(rotations, deltas, rotateDeltas);
-    layer = bottomSurfaceOfPiece(newDeltas);
-    moveToIndex = findLowestInRange(layer.length);
+  // console.log("Game stillShapes", Game.stillShapes)
+  // console.log("aiStillShapes", aiStillShapes)
+  // console.log("moveToIndex", moveToIndex, "bestRotations", bestRotations, "highestScore", highestScore)
+  return [moveToIndex, bestRotations];
+};
+
+// GET SCORE
+var getScore = function getScore(start, layer, newDeltas) {
+
+  var score = 0;
+
+  var fitDeltas = getFitDeltas(start, layer, newDeltas);
+
+  score += numberOfCompleteRows(start, fitDeltas);
+  score += getFitScore(start, layer, fitDeltas);
+
+  return score;
+};
+
+// GET FIT DELTAS
+
+var getFitDeltas = function getFitDeltas(start, layer, deltas) {
+
+  var validHeight = 0;
+  var refOffset = 0;
+  var refIndex = 0;
+
+  for (var i = start; i < start + layer.length; i++) {
+
+    var currentHeightRef = Math.max.apply(Math, _toConsumableArray(aiStillShapes[i])) + 1;
+    var offset = layer[i - start] * -1;
+    var valid = true;
+
+    for (var j = start; j < start + layer.length; j++) {
+      if (j !== i) {
+        if (currentHeightRef + layer[j - start] + offset <= Math.max.apply(Math, _toConsumableArray(aiStillShapes[j]))) {
+          valid = false;
+        }
+      }
+    }
+
+    if (valid) {
+      validHeight = currentHeightRef;
+      refOffset = offset;
+      refIndex = i;
+      break;
+    }
   }
 
-  return [moveToIndex, rotations];
+  var newDeltas = deltas.map(function (delta) {
+    return [delta[0], delta[1]];
+  });
+
+  newDeltas.forEach(function (delta) {
+    if (delta[1] === refIndex) {
+      delta[1] += validHeight;
+    } else {
+      delta[1] += validHeight + refOffset;
+    }
+  });
+
+  return newDeltas;
+};
+
+// GET FIT SCORE
+var getFitScore = function getFitScore(start, layer, fitDeltas) {
+
+  var totalGaps = 0;
+  var heightMax = 0;
+
+  var fitColumns = {};
+
+  fitDeltas.forEach(function (delta) {
+
+    if (fitColumns[delta[0]]) {
+
+      if (delta[1] < fitColumns[delta[0]]) {
+        fitColumns[delta[0]] = delta[1];
+      }
+    } else {
+
+      fitColumns[delta[0]] = delta[1];
+    }
+  });
+
+  for (var i = start; i < start + layer.length; i++) {
+
+    var colHeight = fitColumns[i];
+    var gaps = colHeight - (aiStillShapes[i].length - 1);
+
+    if (colHeight > heightMax) {
+      heightMax = colHeight;
+    }
+    totalGaps += gaps;
+  }
+
+  var heightScore = 24 - (heightMax + 2);
+
+  return heightScore - totalGaps + layer.length;
 };
 
 // FIND FURTHEST LEFT CUBE
@@ -90127,154 +90233,6 @@ var findFurthestLeft = exports.findFurthestLeft = function findFurthestLeft(newS
   });
 
   return mostLeftIndex;
-};
-
-// CONTINUOUS FLATNESS OF BOARD IS > 4 && TALLEST UNDER 5?
-
-var flatnessMinReached = function flatnessMinReached() {
-
-  getAiStillShapes();
-
-  var longestFlat = 0;
-  var currentY = 0;
-  var currentFlat = 0;
-
-  aiStillShapes.forEach(function (col) {
-    var colMax = Math.max.apply(Math, _toConsumableArray(col));
-
-    if (colMax > 4) {
-      return false;
-    }
-
-    if (currentY !== colMax) {
-
-      if (currentFlat > longestFlat) {
-        longestFlat = currentFlat;
-      }
-      currentY = colMax;
-      currentFlat = 1;
-    } else {
-
-      currentFlat += 1;
-    }
-  });
-
-  if (currentFlat > longestFlat) {
-    longestFlat = currentFlat;
-  }
-
-  return longestFlat > 4;
-};
-
-var findLowestInRange = function findLowestInRange(range) {
-  var lowestRange = null;
-  var lowestRangeIndex = 0;
-
-  for (var i = 0; i + range < aiStillShapes; i++) {
-    var currentRangeMax = 0;
-
-    for (var j = 0; j < range; j++) {
-      var colHeight = Math.max.apply(Math, _toConsumableArray(aiStillShapes[i + j]));
-      if (colHeight > currentRangeMax) {
-        currentRangeMax = colHeight;
-      }
-    }
-
-    if (lowestRange === null || currentRangeMax < lowestRange) {
-      lowestRange = currentRangeMax;
-      lowestRangeIndex = i;
-    }
-  }
-
-  return -5 + lowestRangeIndex;
-};
-
-// FIND WIDEST FLAT SURFACE BY ROTATION
-
-var widestFlatSurface = function widestFlatSurface(deltas, rotateDeltas) {
-
-  var currentDeltas = deltas.map(function (delta) {
-    return [delta[0], delta[1]];
-  });
-
-  var widestFlatSurface = 0;
-  var widestRotation = 0;
-  var rotations = 0;
-
-  for (var i = 0; i < rotateDeltas.length; i++) {
-
-    var currentSurface = {};
-    rotations += 1;
-
-    for (var j = 0; j < rotateDeltas[i].length; j++) {
-
-      currentDeltas[j][0] += rotateDeltas[i][j][0];
-      currentDeltas[j][1] += rotateDeltas[i][j][1];
-
-      if (currentSurface[currentDeltas[j][0]]) {
-
-        currentSurface[currentDeltas[j][0]] += 1;
-      } else {
-
-        currentSurface[currentDeltas[j][0]] = 1;
-      }
-    }
-
-    var currentSurfaceLength = (0, _lodash.values)(currentSurface).length;
-
-    if (currentSurfaceLength > widestFlatSurface) {
-
-      widestFlatSurface = currentSurfaceLength;
-      widestRotation = rotations;
-    }
-
-    currentSurface = {};
-  }
-
-  return widestRotation;
-};
-
-var narrowestSurface = function narrowestSurface(deltas, rotateDeltas) {
-
-  var currentDeltas = deltas.map(function (delta) {
-    return [delta[0], delta[1]];
-  });
-
-  var narrowest = null;
-  var narrowestRotation = 0;
-  var rotations = 0;
-
-  for (var i = 0; i < rotateDeltas.length; i++) {
-
-    var currentSurface = {};
-    rotations += 1;
-
-    for (var j = 0; j < rotateDeltas[i].length; j++) {
-
-      currentDeltas[j][0] += rotateDeltas[i][j][0];
-      currentDeltas[j][1] += rotateDeltas[i][j][1];
-
-      if (currentSurface[currentDeltas[j][0]]) {
-
-        currentSurface[currentDeltas[j][0]] += 1;
-      } else {
-
-        currentSurface[currentDeltas[j][0]] = 1;
-      }
-    }
-
-    var currentSurfaceLength = (0, _lodash.values)(currentSurface).length;
-
-    if (narrowest === null || currentSurfaceLength < narrowest) {
-
-      narrowest = currentSurfaceLength;
-      narrowestRotation = rotations;
-    }
-
-    currentSurface = {};
-  }
-
-  return narrowestRotation;
 };
 
 var getDeltas = function getDeltas(rotations, deltas, rotateDeltas) {
@@ -90293,6 +90251,32 @@ var getDeltas = function getDeltas(rotations, deltas, rotateDeltas) {
   }
 
   return currentDeltas;
+};
+
+var moveDeltasToStart = function moveDeltasToStart(start, deltas) {
+
+  var newDeltas = deltas.map(function (delta) {
+    return [delta[0], delta[1]];
+  });
+
+  var furthestLeft = 0;
+  var furthestDown = 0;
+
+  newDeltas.forEach(function (delta) {
+    if (delta[0] < furthestLeft) {
+      furthestLeft = delta[0];
+    }
+    if (delta[1] < furthestDown) {
+      furthestDown = delta[1];
+    }
+  });
+
+  newDeltas.forEach(function (delta) {
+    delta[0] = delta[0] + Math.abs(furthestLeft) + start;
+    delta[1] = delta[1] + Math.abs(furthestDown);
+  });
+
+  return newDeltas;
 };
 
 // MATCH PIECE SHAPE TO STILL SHAPES
@@ -90318,85 +90302,39 @@ var bottomSurfaceOfPiece = function bottomSurfaceOfPiece(deltas) {
     layer = [0];
   }
 
-  if (layer[0] === -1) {
+  if (layer.some(function (el) {
+    return el === -1;
+  })) {
+
     layer = layer.map(function (el) {
       return el + 1;
     });
-  } else if (layer[0] === 1) {
+  } else if (layer.some(function (el) {
+    return el === -2;
+  })) {
+
     layer = layer.map(function (el) {
-      return el - 1;
+      return el + 2;
     });
   }
 
   return layer;
 };
 
-var matchPieceToStillShapes = function matchPieceToStillShapes(layer) {
-
-  getAiStillShapes();
-
-  var lowestReference = null;
-  var lowestIndex = null;
-
-  for (var i = 0; i + layer.length - 1 < aiStillShapes.length; i++) {
-
-    var aligned = false;
-    var topSurfaceResult = void 0,
-        rangeLayer = void 0,
-        reference = void 0;
-
-    topSurfaceResult = topSurfaceInRange(i, layer.length);
-    rangeLayer = topSurfaceResult[0];
-    reference = topSurfaceResult[1];
-
-    aligned = isAligned(layer, rangeLayer);
-
-    if (aligned) {
-      if (lowestReference === null || reference < lowestReference) {
-
-        lowestReference = reference;
-        lowestIndex = i;
-      }
-    }
-  }
-
-  return lowestIndex === null ? null : -5 + lowestIndex;
-};
-
-var topSurfaceInRange = function topSurfaceInRange(start, range) {
-
-  var layer = [];
-  var reference = Math.max.apply(Math, _toConsumableArray(aiStillShapes[start]));
-
-  for (var i = start; i < start + range; i++) {
-
-    var colHeight = Math.max.apply(Math, _toConsumableArray(aiStillShapes[i]));
-    var difference = colHeight + 2 - (reference + 2);
-    layer.push(difference);
-  }
-
-  return [layer, reference];
-};
-
-var isAligned = function isAligned(layer, rangeLayer) {
-  var aligned = true;
-
-  if (layer.length !== rangeLayer.length) {
-    return false;
-  }
-
-  layer.forEach(function (el, i) {
-    if (el !== rangeLayer[i]) {
-      aligned = false;
-    }
-  });
-
-  return aligned;
-};
-
 // FIND MOVE THAT COMPLETES MOST ROWS
 
-var numberOfCompleteRows = function numberOfCompleteRows(potentialMove) {
+var numberOfCompleteRows = function numberOfCompleteRows(start, newDeltas) {
+
+  var potentialMove = {};
+
+  for (var y in Game.allCubes) {
+    potentialMove[y] = Object.assign([], Game.allCubes[y]);
+  }
+
+  newDeltas.forEach(function (delta) {
+    potentialMove[delta[1]].push(delta[0]);
+  });
+
   var rows = 0;
 
   for (var row in potentialMove) {
@@ -90405,7 +90343,7 @@ var numberOfCompleteRows = function numberOfCompleteRows(potentialMove) {
     }
   }
 
-  return rows;
+  return rows * 100;
 };
 
 /***/ }),
