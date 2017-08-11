@@ -20,6 +20,7 @@ const ThreeCanvas = props => {
     0.1,
     100,
   );
+  
   camera.position.z = 13;
   camera.position.y = 12;
   camera.position.x = 0.5;
@@ -158,7 +159,7 @@ const ThreeCanvas = props => {
 
   const aiRotate = rotations => {
 
-    for (let i = 0; i < rotations; i++) {
+    for (let i = 0; i < rotations; i += 1) {
 
       Game.rotateShape(newShape, newRotateDeltas, i)
       shapeDeltaIndex += 1
@@ -211,8 +212,10 @@ const ThreeCanvas = props => {
     //     }
     // }
 
-    if (!newShape.some( c => Game.stillShapes[c.position.x]
-      .includes(Math.ceil(c.position.y) - 1) )) {
+    if (
+      !newShape.some( c => Game.stillShapes[c.position.x]
+      .includes(Math.ceil(c.position.y) - 1) )
+    ) {
 
       Game.moveCubes(newShape, speed, boost)
 
@@ -225,9 +228,7 @@ const ThreeCanvas = props => {
       Game.addStillShape(newShape, scene);
 
       for (var row in Game.allCubes) {
-        if ( Game.allCubes[row].length === 12 ) {
-          completeRow();
-        }
+        if ( Game.allCubes[row].length === 12 ) completeRow();
       }
 
       newShape = Game.nextShape(shapeIndex);
@@ -250,9 +251,7 @@ const ThreeCanvas = props => {
     let rows = [];
 
     for (var row in Game.allCubes) {
-      if ( Game.allCubes[row].length === 12 ) {
-        rows.push(row);
-      }
+      if ( Game.allCubes[row].length === 12 ) rows.push(row);
     }
 
     rows.forEach( row => {

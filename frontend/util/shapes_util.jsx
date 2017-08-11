@@ -1,5 +1,6 @@
 var THREE = require('three');
 
+
 // SHAPES
 var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
@@ -7,7 +8,7 @@ var material = new THREE.MeshPhongMaterial(
   {
     color: 0x6efc7f,
     transparent: true,
-  } 
+  }
 );
 
 var material2 = new THREE.MeshPhongMaterial(

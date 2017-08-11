@@ -9,7 +9,7 @@ const getAiStillShapes = () => {
 
   aiStillShapes = []
 
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 12; i += 1) {
     aiStillShapes.push(Game.stillShapes[(i - 5).toString()])
   }
 }
@@ -35,7 +35,7 @@ export const generateMove = (deltas, rotateDeltas) => {
     return [delta[0], delta[1]]
   })
 
-  for (rotations = 0; rotations < rotateDeltas.length; rotations++) {
+  for (rotations = 0; rotations < rotateDeltas.length; rotations += 1) {
 
     if (rotations > 0) {
       newDeltas = getDeltas(rotations, deltas, rotateDeltas)
@@ -43,7 +43,7 @@ export const generateMove = (deltas, rotateDeltas) => {
 
     layer = bottomSurfaceOfPiece(newDeltas)
 
-    for (let start = 0; start + layer.length - 1 < aiStillShapes.length; start++) {
+    for (let start = 0; start + layer.length - 1 < aiStillShapes.length; start += 1) {
 
         let deltasAtStart = moveDeltasToStart(start, newDeltas)
 
@@ -61,6 +61,9 @@ export const generateMove = (deltas, rotateDeltas) => {
   // console.log("Game stillShapes", Game.stillShapes)
   // console.log("aiStillShapes", aiStillShapes)
   // console.log("moveToIndex", moveToIndex, "bestRotations", bestRotations, "highestScore", highestScore)
+
+  if (bestRotations > 2) { debugger }
+
   return [moveToIndex, bestRotations]
 }
 
@@ -86,19 +89,17 @@ const getFitDeltas = (start, layer, deltas) => {
   let refOffset = 0
   let refIndex = 0
 
-  for (let i = start; i < start + layer.length; i++) {
+  for (let i = start; i < start + layer.length; i += 1) {
 
     let currentHeightRef = Math.max(...aiStillShapes[i]) + 1
     let offset = layer[i - start] * -1
     let valid = true
 
-    for (let j = start; j < start + layer.length; j++) {
+    for (let j = start; j < start + layer.length; j += 1) {
       if(j !== i) {
         let colHeight = currentHeightRef + layer[j - start] + offset
 
-        if (colHeight <= Math.max(...aiStillShapes[j])) {
-          valid = false
-        }
+        if (colHeight <= Math.max(...aiStillShapes[j])) valid = false;
       }
     }
 
@@ -110,9 +111,7 @@ const getFitDeltas = (start, layer, deltas) => {
     }
   }
 
-  let newDeltas = deltas.map( delta => {
-    return [delta[0], delta[1]]
-  })
+  let newDeltas = deltas.map( delta => [delta[0], delta[1]] )
 
   newDeltas.forEach( delta => {
     if (delta[1] === refIndex) {
@@ -149,12 +148,12 @@ const getFitScore = (start, layer, fitDeltas) => {
     }
   })
 
-  for (let i = start; i < start + layer.length; i++) {
+  for (let i = start; i < start + layer.length; i += 1) {
 
     let colHeight = fitColumns[i]
     let gaps = colHeight - (aiStillShapes[i].length - 1)
 
-    if (colHeight > heightMax) { heightMax = colHeight }
+    if (colHeight > heightMax) heightMax = colHeight;
     totalGaps += gaps
   }
 
@@ -187,9 +186,9 @@ const getDeltas = (rotations, deltas, rotateDeltas) => {
     return [delta[0], delta[1]]
   })
 
-  for (let i = 0; i < rotations; i++) {
+  for (let i = 0; i < rotations; i += 1) {
 
-    for (let j = 0; j < rotateDeltas[i].length; j++) {
+    for (let j = 0; j < rotateDeltas[i].length; j += 1) {
 
       currentDeltas[j][0] += rotateDeltas[i][j][0]
       currentDeltas[j][1] += rotateDeltas[i][j][1]
@@ -202,9 +201,7 @@ const getDeltas = (rotations, deltas, rotateDeltas) => {
 
 const moveDeltasToStart = (start, deltas) => {
 
-  let newDeltas = deltas.map( delta => {
-    return [delta[0], delta[1]]
-  })
+  let newDeltas = deltas.map( delta => [delta[0], delta[1]] )
 
   let furthestLeft = 0
   let furthestDown = 0
@@ -230,7 +227,7 @@ const bottomSurfaceOfPiece = deltas => {
   let layer = []
   let seenX = {}
 
-  for (let i = 0; i < deltas.length; i ++) {
+  for (let i = 0; i < deltas.length; i += 1) {
 
     if (!seenX[deltas[i][0]]) {
 
@@ -244,7 +241,7 @@ const bottomSurfaceOfPiece = deltas => {
   }
 
 
-  if (layer.length === 1) { layer = [0] }
+  if (layer.length === 1) layer = [0];
 
 
   if (layer.some( el => el === -1 ) ) {
@@ -268,21 +265,19 @@ const numberOfCompleteRows = (start, newDeltas) => {
 
   let potentialMove = {}
 
-  for (var y in Game.allCubes) {
-    potentialMove[y] = [ ...Game.allCubes[y] ]
-  }
-
-  newDeltas.forEach( delta => {
-    potentialMove[delta[1]].push(delta[0])
+  Object.keys(Game.allCubes).forEach( col => {
+    potentialMove[col] = [ ...Game.allCubes[col] ]
   })
+
+  newDeltas.forEach( delta => potentialMove[delta[1]].push(delta[0]) )
 
   let rows = 0
 
-  for (var row in potentialMove) {
+  Object.keys(potentialMove).forEach( row => {
     if ( potentialMove[row].length === 12 ) {
       rows += 1
     }
-  }
+  })
 
   return rows * 100
 }

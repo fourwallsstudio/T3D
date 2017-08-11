@@ -44,12 +44,10 @@ class Displays extends React.Component {
       rotate = "";
     }
 
-    if (this.props.level === 7) {
-      levelSeven = " level-seven";
-    }
+    if (this.props.level === 7) levelSeven = " level-seven";
 
-    if (this.props.gameStatus !== 'welcome') { hidden = ' hidden'};
-    if (this.props.gameStatus === 'gameover') { gameover = ' gameover'};
+    if (this.props.gameStatus !== 'welcome') hidden = ' hidden';
+    if (this.props.gameStatus === 'gameover') gameover = ' gameover';
     if (this.state.gridDisable || !this.state.gridActive) {
       gridActive = "";
     } else {

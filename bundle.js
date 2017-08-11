@@ -55773,9 +55773,7 @@ var fullRow = exports.fullRow = function fullRow(scene) {
   var rows = [];
 
   for (var row in allCubes) {
-    if (allCubes[row].length === 12) {
-      rows.push(row);
-    }
+    if (allCubes[row].length === 12) rows.push(row);
   }
 
   if (rows.length > 0) {
@@ -55811,9 +55809,9 @@ var reassembleCubes = function reassembleCubes(rows) {
   return new Promise(function (resolve, reject) {
     rows = rows();
 
-    for (var l = 0; l < rows.length; l++) {
+    for (var l = 0; l < rows.length; l += 1) {
 
-      for (var i = 0; i < 23; i++) {
+      for (var i = 0; i < 23; i += 1) {
         var j = i + 1;
 
         if (allCubes[i].length === 0) {
@@ -55833,8 +55831,7 @@ var reassembleCubes = function reassembleCubes(rows) {
 var reassembleStillShapes = function reassembleStillShapes() {
   for (var col in stillShapes) {
     stillShapes[col] = [-1];
-  }
-  for (var row in allCubes) {
+  }for (var row in allCubes) {
     allCubes[row].forEach(function (c) {
       stillShapes[c.position.x].push(c.position.y);
     });
@@ -86516,16 +86513,10 @@ var Displays = function (_React$Component) {
         rotate = "";
       }
 
-      if (this.props.level === 7) {
-        levelSeven = " level-seven";
-      }
+      if (this.props.level === 7) levelSeven = " level-seven";
 
-      if (this.props.gameStatus !== 'welcome') {
-        hidden = ' hidden';
-      };
-      if (this.props.gameStatus === 'gameover') {
-        gameover = ' gameover';
-      };
+      if (this.props.gameStatus !== 'welcome') hidden = ' hidden';
+      if (this.props.gameStatus === 'gameover') gameover = ' gameover';
       if (this.state.gridDisable || !this.state.gridActive) {
         gridActive = "";
       } else {
@@ -86781,9 +86772,7 @@ var Player = function (_React$Component) {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
       if (this.state.level !== nextProps.level) {
-        if (nextProps.level === 7) {
-          this.howlerPlayer(this.song2);
-        }
+        if (nextProps.level === 7) this.howlerPlayer(this.song2);
       }
 
       this.setState({
@@ -86800,16 +86789,13 @@ var Player = function (_React$Component) {
           this.state.sound.play();
         } else if (this.state.gameStatus === 'paused' || this.state.gameStatus === 'gameover') {
           this.state.sound.pause();
-          // this.setState({ isPaused: true });
         }
       }
 
       if (this.state.level !== prevState.level) {
         if (this.state.level === 7) {
           this.state.sound.play();
-          if (!this.state.isPaused) {
-            this.state.sound.fade(0, 0.5, 2000);
-          }
+          if (!this.state.isPaused) this.state.sound.fade(0, 0.5, 2000);
         }
       }
     }
@@ -89748,6 +89734,7 @@ var ThreeCanvas = function ThreeCanvas(props) {
 
   var scene = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 100);
+
   camera.position.z = 13;
   camera.position.y = 12;
   camera.position.x = 0.5;
@@ -89872,7 +89859,7 @@ var ThreeCanvas = function ThreeCanvas(props) {
 
   var aiRotate = function aiRotate(rotations) {
 
-    for (var i = 0; i < rotations; i++) {
+    for (var i = 0; i < rotations; i += 1) {
 
       Game.rotateShape(newShape, newRotateDeltas, i);
       shapeDeltaIndex += 1;
@@ -89936,9 +89923,7 @@ var ThreeCanvas = function ThreeCanvas(props) {
       Game.addStillShape(newShape, scene);
 
       for (var row in Game.allCubes) {
-        if (Game.allCubes[row].length === 12) {
-          completeRow();
-        }
+        if (Game.allCubes[row].length === 12) completeRow();
       }
 
       newShape = Game.nextShape(shapeIndex);
@@ -89959,9 +89944,7 @@ var ThreeCanvas = function ThreeCanvas(props) {
     var rows = [];
 
     for (var row in Game.allCubes) {
-      if (Game.allCubes[row].length === 12) {
-        rows.push(row);
-      }
+      if (Game.allCubes[row].length === 12) rows.push(row);
     }
 
     rows.forEach(function (row) {
@@ -90092,7 +90075,7 @@ var getAiStillShapes = function getAiStillShapes() {
 
   aiStillShapes = [];
 
-  for (var i = 0; i < 12; i++) {
+  for (var i = 0; i < 12; i += 1) {
     aiStillShapes.push(Game.stillShapes[(i - 5).toString()]);
   }
 };
@@ -90119,7 +90102,7 @@ var generateMove = exports.generateMove = function generateMove(deltas, rotateDe
     return [delta[0], delta[1]];
   });
 
-  for (rotations = 0; rotations < rotateDeltas.length; rotations++) {
+  for (rotations = 0; rotations < rotateDeltas.length; rotations += 1) {
 
     if (rotations > 0) {
       newDeltas = getDeltas(rotations, deltas, rotateDeltas);
@@ -90127,7 +90110,7 @@ var generateMove = exports.generateMove = function generateMove(deltas, rotateDe
 
     layer = bottomSurfaceOfPiece(newDeltas);
 
-    for (var start = 0; start + layer.length - 1 < aiStillShapes.length; start++) {
+    for (var start = 0; start + layer.length - 1 < aiStillShapes.length; start += 1) {
 
       var deltasAtStart = moveDeltasToStart(start, newDeltas);
 
@@ -90145,6 +90128,11 @@ var generateMove = exports.generateMove = function generateMove(deltas, rotateDe
   // console.log("Game stillShapes", Game.stillShapes)
   // console.log("aiStillShapes", aiStillShapes)
   // console.log("moveToIndex", moveToIndex, "bestRotations", bestRotations, "highestScore", highestScore)
+
+  if (bestRotations > 2) {
+    debugger;
+  }
+
   return [moveToIndex, bestRotations];
 };
 
@@ -90168,19 +90156,17 @@ var getFitDeltas = function getFitDeltas(start, layer, deltas) {
   var refOffset = 0;
   var refIndex = 0;
 
-  for (var i = start; i < start + layer.length; i++) {
+  for (var i = start; i < start + layer.length; i += 1) {
 
     var currentHeightRef = Math.max.apply(Math, _toConsumableArray(aiStillShapes[i])) + 1;
     var offset = layer[i - start] * -1;
     var valid = true;
 
-    for (var j = start; j < start + layer.length; j++) {
+    for (var j = start; j < start + layer.length; j += 1) {
       if (j !== i) {
         var colHeight = currentHeightRef + layer[j - start] + offset;
 
-        if (colHeight <= Math.max.apply(Math, _toConsumableArray(aiStillShapes[j]))) {
-          valid = false;
-        }
+        if (colHeight <= Math.max.apply(Math, _toConsumableArray(aiStillShapes[j]))) valid = false;
       }
     }
 
@@ -90228,14 +90214,12 @@ var getFitScore = function getFitScore(start, layer, fitDeltas) {
     }
   });
 
-  for (var i = start; i < start + layer.length; i++) {
+  for (var i = start; i < start + layer.length; i += 1) {
 
     var colHeight = fitColumns[i];
     var gaps = colHeight - (aiStillShapes[i].length - 1);
 
-    if (colHeight > heightMax) {
-      heightMax = colHeight;
-    }
+    if (colHeight > heightMax) heightMax = colHeight;
     totalGaps += gaps;
   }
 
@@ -90265,9 +90249,9 @@ var getDeltas = function getDeltas(rotations, deltas, rotateDeltas) {
     return [delta[0], delta[1]];
   });
 
-  for (var i = 0; i < rotations; i++) {
+  for (var i = 0; i < rotations; i += 1) {
 
-    for (var j = 0; j < rotateDeltas[i].length; j++) {
+    for (var j = 0; j < rotateDeltas[i].length; j += 1) {
 
       currentDeltas[j][0] += rotateDeltas[i][j][0];
       currentDeltas[j][1] += rotateDeltas[i][j][1];
@@ -90310,7 +90294,7 @@ var bottomSurfaceOfPiece = function bottomSurfaceOfPiece(deltas) {
   var layer = [];
   var seenX = {};
 
-  for (var i = 0; i < deltas.length; i++) {
+  for (var i = 0; i < deltas.length; i += 1) {
 
     if (!seenX[deltas[i][0]]) {
 
@@ -90322,9 +90306,7 @@ var bottomSurfaceOfPiece = function bottomSurfaceOfPiece(deltas) {
     }
   }
 
-  if (layer.length === 1) {
-    layer = [0];
-  }
+  if (layer.length === 1) layer = [0];
 
   if (layer.some(function (el) {
     return el === -1;
@@ -90351,21 +90333,21 @@ var numberOfCompleteRows = function numberOfCompleteRows(start, newDeltas) {
 
   var potentialMove = {};
 
-  for (var y in Game.allCubes) {
-    potentialMove[y] = [].concat(_toConsumableArray(Game.allCubes[y]));
-  }
+  Object.keys(Game.allCubes).forEach(function (col) {
+    potentialMove[col] = [].concat(_toConsumableArray(Game.allCubes[col]));
+  });
 
   newDeltas.forEach(function (delta) {
-    potentialMove[delta[1]].push(delta[0]);
+    return potentialMove[delta[1]].push(delta[0]);
   });
 
   var rows = 0;
 
-  for (var row in potentialMove) {
+  Object.keys(potentialMove).forEach(function (row) {
     if (potentialMove[row].length === 12) {
       rows += 1;
     }
-  }
+  });
 
   return rows * 100;
 };

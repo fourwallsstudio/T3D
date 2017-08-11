@@ -104,7 +104,7 @@ export const addStillShape = (stillShape, scene) => {
     if (!stillShapes[s.position.x].includes(s.position.y)) {
 
       let yPosition = s.position.y === -0 ? 0 : s.position.y
-      allCubes[yPosition].push( s );
+      allCubes[yPosition].push(s);
       stillShapes[s.position.x].push( yPosition );
 
     } else {
@@ -133,9 +133,9 @@ export const moveRight = shape => {
 
 const moveValid = (shape, direction) => {
   const step = direction === 'left' ? -1 : 1
-  const inBounds = direction === 'left' ?
-    shape.every( c => c.position.x > -5) :
-    shape.every( c => c.position.x < 6 )
+  const inBounds = direction === 'left'
+    ? shape.every( c => c.position.x > -5)
+    : shape.every( c => c.position.x < 6 )
 
   return (
     !shape.some( c => stillShapes[c.position.x + step] &&
@@ -166,10 +166,12 @@ export const rotatable = (newShape, newRotateDeltas, shapeDeltaIndex) => {
     if (newX > 6 || newX < -5) {
       return false
 
-    } else if (stillShapes[newX]
-        .includes(Math.ceil(newShape[i].position.y + d[1]) - 1)) {
+    } else if (
+      stillShapes[newX]
+        .includes(Math.ceil(newShape[i].position.y + d[1]) - 1)
+    ) {
 
-          return false
+      return false
     }
   }
 
@@ -201,9 +203,7 @@ export const fullRow = (scene) => {
   let rows = []
 
   for (var row in allCubes) {
-    if ( allCubes[row].length === 12 ) {
-      rows.push(row);
-    }
+    if ( allCubes[row].length === 12 ) rows.push(row);
   }
 
   if (rows.length > 0) {
@@ -235,9 +235,9 @@ const reassembleCubes = rows => {
   return new Promise((resolve, reject) => {
     rows = rows();
 
-    for (let l = 0; l < rows.length; l++) {
+    for (let l = 0; l < rows.length; l += 1) {
 
-      for (let i = 0; i < 23; i++) {
+      for (let i = 0; i < 23; i += 1) {
         let j = i + 1;
 
         if (allCubes[i].length === 0) {
@@ -253,7 +253,7 @@ const reassembleCubes = rows => {
 }
 
 const reassembleStillShapes = () => {
-  for (var col in stillShapes) { stillShapes[col] = [-1] }
+  for (var col in stillShapes) stillShapes[col] = [-1];
   for (var row in allCubes) {
     allCubes[row].forEach( c => {
       stillShapes[c.position.x].push(c.position.y)
