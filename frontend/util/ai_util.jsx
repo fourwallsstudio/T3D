@@ -1,5 +1,5 @@
 var THREE = require('three');
-import * as Shape from './shapes_util';
+// import Shape from '../components/three/elements/shapes';
 import * as Game from './game_util';
 import { values } from 'lodash';
 

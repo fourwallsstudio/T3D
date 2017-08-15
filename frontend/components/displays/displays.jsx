@@ -1,6 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { updateGrid } from '../../actions/game_actions';
+import { updateGrid, updateGameStatus } from '../../actions/game_actions';
+import { fetchHighScores, createHighScore } from '../../actions/highscore_actions';
+import AddHighScoreForm from './add_highscore_form';
+import HighScoreDisplay from './highscore_display';
 
 class Displays extends React.Component {
   constructor(props) {
@@ -8,56 +11,81 @@ class Displays extends React.Component {
 
     this.state = {
       gridActive: false,
-      gridDisable: false
+      gridDisable: false,
+      addHighScoreModalActive: false,
+      highScoreDisplay: false,
     }
-
-    const that = this;
 
     document.addEventListener("keypress", function(e) {
       if (e.key === 'g') {
-        that.setState({
-          gridActive: !that.state.gridActive
+        this.setState({
+          gridActive: !this.state.gridActive
         })
       }
-    })
+    }.bind(this))
+
+    this.handleClick = this.handleClick.bind(this);
+    this.handleHSToggle = this.handleHSToggle.bind(this);
   }
 
   componentDidMount() {
+    this.props.fetchHighScores()
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.gridDisable !== nextProps.gridDisable) {
+      this.setState({ gridDisable: nextProps.gridDisable });
+    }
+
+    if (nextProps.gameStatus === 'gameover'
+        && (nextProps.highscores.length === 0
+        || nextProps.highscores[nextProps.highscores.length - 1].score <= nextProps.score)) {
+
+        this.setState({ addHighScoreModalActive: true })
+    }
+  }
+
+  handleClick() {
     this.setState({
-      gridDisable: nextProps.gridDisable
-    })
+      addHighScoreModalActive: false,
+      highScoreDisplay: true
+    });
+  }
+
+  handleHSToggle() {
+    this.setState({ highScoreDisplay: !this.state.highScoreDisplay });
   }
 
   render() {
-    let hidden = "";
-    let rotate = "";
-    let levelSeven = "";
-    let gameover = "";
-    let gridActive = "";
+    const hidden = this.props.gameStatus !== 'welcome' ? ' hidden' : '';
+    const rotate = this.props.level % 2 === 0 ? ' rotate' : '';
+    const sky = this.props.level > 20 ? ' sky' : '';
+    const gameover = this.props.gameStatus === 'gameover' ? ' gameover' : '';
+    const gridActive = this.state.gridDisable || !this.state.gridActive
+      ? '' : ' grid-active'
+    let addHighScoreModal;
+    let highScoreDisplay;
 
-    if (this.props.level % 2 === 0) {
-      rotate = " rotate";
+    if (this.state.addHighScoreModalActive) {
+      addHighScoreModal = <AddHighScoreForm
+                            createHighScore={ this.props.createHighScore }
+                            score={ this.props.score }
+                            handleClick={ this.handleClick }
+                            updateGameStatus={ this.props.updateGameStatus } />;
     } else {
-      rotate = "";
+      addHighScoreModal = "";
     }
 
-    if (this.props.level === 7) levelSeven = " level-seven";
-
-    if (this.props.gameStatus !== 'welcome') hidden = ' hidden';
-    if (this.props.gameStatus === 'gameover') gameover = ' gameover';
-    if (this.state.gridDisable || !this.state.gridActive) {
-      gridActive = "";
+    if (this.state.highScoreDisplay) {
+      highScoreDisplay = <HighScoreDisplay
+                            highscores={ this.props.highscores } />;
     } else {
-      gridActive = ' grid-active';
+      highScoreDisplay = "";
     }
-
 
     return (
       <section>
-        <div className={"backgound-black" + levelSeven}></div>
+        <div className={"backgound-black" + sky}></div>
         <div className={"keyboard-wasd" + rotate}>
           <img  src="assets/wasd.png"></img>
         </div>
@@ -81,6 +109,9 @@ class Displays extends React.Component {
         <div className={"gameover-display" + gameover}>
           <h1>game over</h1>
         </div>
+
+        { highScoreDisplay }
+        { addHighScoreModal }
 
         <div className={"grid-box" + gridActive}>
           <div className="grid"></div>
@@ -121,6 +152,10 @@ class Displays extends React.Component {
           </div>
         </div>
 
+        <div className="highscore-display-toggle" onClick={ this.handleHSToggle }>
+          <h1>HS</h1>
+        </div>
+
         <div className="contact-container">
           <a href="http://calvinmcelroy.us/" target="_blank"><p>calvinmcelroy.us</p></a>
           <a href="mailto:fourwallsstudio@gmail.com"><p>fourwallsstudio@gmail.com</p></a>
@@ -145,16 +180,25 @@ class Displays extends React.Component {
 
 
 
-const mapStateToProps = ({ game }) => {
+const mapStateToProps = ({ game, highscores }) => {
   return {
     score: game.score,
     level: game.level,
     gameStatus: game.gameStatus,
-    gridDisable: game.gridDisable
+    gridDisable: game.gridDisable,
+    highscores,
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchHighScores: () => dispatch(fetchHighScores()),
+    createHighScore: hs => dispatch(createHighScore(hs)),
+    updateGameStatus: status => dispatch(updateGameStatus(status)),
   }
 }
 
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(Displays)

@@ -45,7 +45,7 @@ main h1 {
   transition: background-color 1.3s ease-in-out;
 }
 
-.level-seven {
+.sky {
   background-color: rgba(0, 0, 0 , 0);
   transition: background-color 1.3s ease-in-out;
 }
@@ -76,7 +76,9 @@ main h1 {
 .restart-toggle:hover,
 .github-img:hover,
 .angellist-img:hover,
-.linkedin-img:hover {
+.linkedin-img:hover,
+.highscore-display-container:hover,
+.highscore-display-toggle:hover {
   opacity: 0.8;
   -moz-transform: scaleX(-1);
   -o-transform: scaleX(-1);
@@ -140,7 +142,7 @@ main h1 {
   width: 20%;
   /*height: 20%;*/
   top: 10%;
-  left: 41%;
+  left: 40%;
   transition: transform 1.3s ease-in-out;
 }
 
@@ -314,4 +316,91 @@ main h1 {
 .contact-icons-box img {
   width: 100%;
   height: auto;
+}
+
+
+.add-highscore-form-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1000;
+  width: 30%;
+  /*height: 30%;*/
+  transform: translateX(-50%) translateY(-50%);
+  background-color: black;
+  border: solid 5px white;
+  border-radius: 5px;
+  padding: 20px 0;
+}
+
+.add-highscore-form-container input {
+  display: block;
+  height: 80px;
+  width: 30%;
+  font-size: 50px;
+  margin: 10px auto;
+  padding-left: 20px;
+  border: solid 1px white;
+  border-radius: 5px;
+}
+
+.add-highscore-form-container h1 {
+  font-size: 30px;
+  line-height: 30px;
+  margin: 10px auto;
+}
+
+.add-highscore-form-container button {
+  display: block;
+  font-size: 30px;
+  border: solid 1px white;
+  border-radius: 5px;
+  margin: 10px auto;
+  padding: 5px 10px;
+}
+
+.highscore-display-container {
+  position: absolute;
+  bottom: 10%;
+  left: 20%;
+  width: 16%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: black;
+  border: solid 2px white;
+  border-radius: 5px;
+  padding: 20px 0;
+  transition: transform 1.3s ease-in-out
+}
+
+.highscore-display-container h1 {
+  font-size: 30px;
+  border-bottom: solid 1px white;
+  margin-bottom: 20px;
+}
+
+.highscore-display-container li {
+  width: 50%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.highscore-display-container h2 {
+  font-size: 20px;
+}
+
+.highscore-display-toggle {
+  position: absolute;
+  bottom: 5%;
+  left: 40px;
+  transition: transform 1.3s ease-in-out;
+}
+
+.highscore-display-toggle:hover {
+  cursor: pointer;
+}
+
+.highscore-display-toggle h1 {
+  font-size: 20px;
 }
