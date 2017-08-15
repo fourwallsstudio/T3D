@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "webpack --watch",
     "start": "node server/start",
-    "postinstall": "webpack && start",
+    "postinstall": "webpack && node server/start",
   },
   "repository": {
     "type": "git",
