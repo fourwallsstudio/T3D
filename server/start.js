@@ -46,6 +46,6 @@ const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
   console.log('example app')
-  db.sync()
+  db.sync({force: true})
     .then( () => console.log('db up') )
 })
