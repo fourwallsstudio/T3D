@@ -3,6 +3,7 @@ export const UPDATE_LEVEL = 'UPDATE_LEVEL';
 export const UPDATE_GAME_STATUS = 'UPDATE_GAME_STATUS';
 export const DISABLE_GRID = 'DISABLE_GRID';
 
+
 export const updateScore = score => {
   return {
     type: UPDATE_SCORE,

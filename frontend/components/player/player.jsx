@@ -27,9 +27,7 @@ class Player extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.state.level !== nextProps.level ) {
-      if (nextProps.level === 7) {
-        this.howlerPlayer(this.song2);
-      }
+      if (nextProps.level === 7) this.howlerPlayer(this.song2);
     }
 
     this.setState({
@@ -47,16 +45,13 @@ class Player extends React.Component {
       } else if (this.state.gameStatus === 'paused' ||
       this.state.gameStatus === 'gameover') {
         this.state.sound.pause();
-        // this.setState({ isPaused: true });
       }
     }
 
   if (this.state.level !== prevState.level) {
     if (this.state.level === 7) {
         this.state.sound.play();
-        if (!this.state.isPaused) {
-          this.state.sound.fade(0, 0.5, 2000);
-        }
+        if (!this.state.isPaused) this.state.sound.fade(0, 0.5, 2000);
     }
   }
 }
