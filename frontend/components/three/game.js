@@ -260,20 +260,6 @@ export default class Game {
   }
 
   wipeGrid() {
-    // for (let row in this.allCubes) {
-    //   this.allCubes[row].forEach( cube => {
-    //     this.scene.remove( cube )
-    //   })
-    // }
-    //
-    // this.currentShape.cubes.forEach( cube => {
-    //   this.scene.remove( cube )
-    // })
-    //
-    // this.nextShape.cubes.forEach( cube => {
-    //   this.scene.remove( cube )
-    // })
-
     this.scene = new Scene
     this.camera = new Camera
     this.renderer = null
