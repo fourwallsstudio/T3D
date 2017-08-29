@@ -69,9 +69,7 @@ const ThreeCanvas = props => {
         game.pause()
         game.wipeGrid()
         newGame()
-        // renderer.render( game.scene.scene, game.camera.camera )
         props.updateGameStatus('welcome')
-        // window.location.reload(false)
         break
 
       case "v":
