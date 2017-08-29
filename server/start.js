@@ -1,5 +1,5 @@
 'use strict'
-require('./newrelic');
+require('newrelic');
 
 const express = require('express')
 const app = express()
