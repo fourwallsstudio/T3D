@@ -69,7 +69,6 @@ main h1 {
 .keyboard-wasd:hover,
 .keyboard-play:hover,
 .play-pause-button:hover,
-.opening:hover,
 .display-aside:hover,
 .grid-toggle:hover,
 .view-toggle:hover,
@@ -119,6 +118,7 @@ main h1 {
 }
 
 .play-pause-button {
+  display: none;
   position: absolute;
   width: 20px;
   height: 20px;
@@ -135,14 +135,10 @@ main h1 {
 
 .opening {
   position: absolute;
-  /*width: 200px;
-  height: 200px;*/
-  /*top: 50px;*/
-  /*left: 540px;*/
-  width: 20%;
-  /*height: 20%;*/
-  top: 10%;
-  left: 40%;
+  width: 36vh;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
   transition: transform 1.3s ease-in-out;
 }
 
@@ -165,14 +161,11 @@ main h1 {
 .gameover-display {
   display: none;
   position: absolute;
-  /*width: 200px;*/
-  /*height: 200px;
-  top: 200px;
-  left: 540px;*/
-  width: 15%;
-  height: 20%;
+  width: 36vh;
+  height: 20vh;
   top: 30%;
-  left: 43%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .gameover-display h1 {
@@ -191,17 +184,11 @@ main h1 {
   display: none;
   justify-content: space-between;
   position: absolute;
-  /*top: 50px;
-  left: 500px;*/
   z-index: -1;
-  /*height: 520px;
-  width: 244px;*/
   top: 10%;
   left: 50%;
-  height: 80%;
-  width: 20%;
-  /*padding: 18px;*/
-  /*padding: 1.4%;*/
+  height: 80vh;
+  width: 37.5vh;
   transform: translateX(-50%);
 }
 
@@ -210,7 +197,6 @@ main h1 {
 }
 
 .grid {
-  /*width: 16px;*/
   width: 7%;
   opacity: .2;
   background-color: white;
@@ -289,6 +275,7 @@ main h1 {
   width: 180px;
   text-align: center;
   border: solid 2px white;
+  background: black;
   border-radius: 5px;
   padding: 10px;
 }
@@ -325,7 +312,6 @@ main h1 {
   left: 50%;
   z-index: 1000;
   width: 30%;
-  /*height: 30%;*/
   transform: translateX(-50%) translateY(-50%);
   background-color: black;
   border: solid 5px white;
