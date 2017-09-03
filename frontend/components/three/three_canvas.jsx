@@ -62,7 +62,6 @@ const ThreeCanvas = props => {
 
       case "p":
         playAndPause()
-        // aiPlay(...aiMoves)
         break
 
       case "r":
@@ -81,53 +80,6 @@ const ThreeCanvas = props => {
         return
     }
   })
-
-
-  // AI
-  // let shapeDeltas = Shape.deltas[shapeIndex % 7]
-  // let aiMoves = AI.generateMove(shapeDeltas, newRotateDeltas);
-  //
-  //
-  // const aiPlay = (moveIndex, rotations) => {
-  //
-  //   aiRotate(rotations)
-  //
-  //   aiMakeMove(moveIndex)
-  //
-  //   boost = .3;
-  // }
-  //
-  //
-  // const aiRotate = rotations => {
-  //
-  //   for (let i = 0; i < rotations; i += 1) {
-  //
-  //     Game.rotateShape(newShape, newRotateDeltas, i)
-  //     shapeDeltaIndex += 1
-  //   }
-  // }
-  //
-  //
-  // const aiMakeMove = moveIndex => {
-  //
-  //   let furthestLeftIndex = AI.findFurthestLeft(newShape);
-  //
-  //   while (newShape[furthestLeftIndex].position.x !== moveIndex) {
-  //
-  //     if (moveIndex < newShape[furthestLeftIndex].position.x) {
-  //
-  //       Game.moveLeft(newShape)
-  //
-  //     } else {
-  //
-  //       Game.moveRight(newShape)
-  //     }
-  //   }
-  // }
-
-
-
-
 
   const playAndPause = () => {
     if (isPaused) {
