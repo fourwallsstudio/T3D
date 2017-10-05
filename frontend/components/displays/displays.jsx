@@ -1,9 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { updateGrid, updateGameStatus } from '../../actions/game_actions';
+
+// ACTIONS
+import { updateGrid, updateGameStatus, updateScore } from '../../actions/game_actions';
 import { fetchHighScores, createHighScore } from '../../actions/highscore_actions';
-import AddHighScoreForm from './add_highscore_form';
+
+// COMPONENTS
+import HighScoreForm from './highscore_form';
 import HighScoreDisplay from './highscore_display';
+import ContactInfo from './contact_info';
+
+
+
 
 class Displays extends React.Component {
   constructor(props) {
@@ -12,7 +20,7 @@ class Displays extends React.Component {
     this.state = {
       gridActive: false,
       gridDisable: false,
-      addHighScoreModalActive: false,
+      highScoreFormActive: false,
       highScoreDisplay: false,
     }
 
@@ -26,6 +34,7 @@ class Displays extends React.Component {
 
     this.handleClick = this.handleClick.bind(this);
     this.handleHSToggle = this.handleHSToggle.bind(this);
+    this.disableHighScoreForm = this.disableHighScoreForm.bind(this);
   }
 
   componentDidMount() {
@@ -41,19 +50,23 @@ class Displays extends React.Component {
         && (nextProps.highscores.length === 0
         || nextProps.highscores[nextProps.highscores.length - 1].score <= nextProps.score)) {
 
-        this.setState({ addHighScoreModalActive: true })
+        this.setState({ highScoreFormActive: true })
     }
   }
 
   handleClick() {
     this.setState({
-      addHighScoreModalActive: false,
+      highScoreFormActive: false,
       highScoreDisplay: true
     });
   }
 
   handleHSToggle() {
     this.setState({ highScoreDisplay: !this.state.highScoreDisplay });
+  }
+
+  disableHighScoreForm() {
+    this.setState({ highScoreFormActive: false });
   }
 
   render() {
@@ -63,17 +76,20 @@ class Displays extends React.Component {
     const gameover = this.props.gameStatus === 'gameover' ? ' gameover' : '';
     const gridActive = this.state.gridDisable || !this.state.gridActive
       ? '' : ' grid-active'
-    let addHighScoreModal;
+    let highScoreForm;
     let highScoreDisplay;
 
-    if (this.state.addHighScoreModalActive) {
-      addHighScoreModal = <AddHighScoreForm
+
+    if (this.state.highScoreFormActive) {
+      highScoreForm = <HighScoreForm
                             createHighScore={ this.props.createHighScore }
+                            updateScore={ this.props.updateScore }
                             score={ this.props.score }
                             handleClick={ this.handleClick }
-                            updateGameStatus={ this.props.updateGameStatus } />;
+                            updateGameStatus={ this.props.updateGameStatus }
+                            disableHighScoreForm={ this.disableHighScoreForm } />;
     } else {
-      addHighScoreModal = "";
+      highScoreForm = "";
     }
 
     if (this.state.highScoreDisplay) {
@@ -109,9 +125,12 @@ class Displays extends React.Component {
         <div className={"gameover-display" + gameover}>
           <h1>game over</h1>
         </div>
+        <div className={"gameover-replay" + gameover}>
+          <p>press "R" to replay</p>
+        </div>
 
         { highScoreDisplay }
-        { addHighScoreModal }
+        { highScoreForm }
 
         <div className={"grid-box" + gridActive}>
           <div className="grid"></div>
@@ -156,21 +175,7 @@ class Displays extends React.Component {
           <h1>HS</h1>
         </div>
 
-        <div className="contact-container">
-          <a href="http://calvinmcelroy.us/" target="_blank"><p>calvinmcelroy.us</p></a>
-          <a href="mailto:fourwallsstudio@gmail.com"><p>fourwallsstudio@gmail.com</p></a>
-          <div className="contact-icons-box">
-            <a href="https://github.com/fourwallsstudio" target="_blank" className="github-img">
-              <img src="assets/github.png"></img>
-            </a>
-            <a href="https://angel.co/calvin-mcelroy-1" target="_blank" className="angellist-img">
-              <img src="assets/angellist.png"></img>
-            </a>
-            <a href="https://www.linkedin.com/in/calvin-mcelroy-04253210b/" target="_blank" className="linkedin-img">
-              <img src="assets/linkedin.png"></img>
-            </a>
-          </div>
-        </div>
+        <ContactInfo />
 
       </section>
     )
@@ -195,6 +200,7 @@ const mapDispatchToProps = dispatch => {
     fetchHighScores: () => dispatch(fetchHighScores()),
     createHighScore: hs => dispatch(createHighScore(hs)),
     updateGameStatus: status => dispatch(updateGameStatus(status)),
+    updateScore: score => dispatch(updateScore(score)),
   }
 }
 

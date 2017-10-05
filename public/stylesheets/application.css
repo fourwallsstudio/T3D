@@ -180,6 +180,29 @@ main h1 {
   display: block;
 }
 
+.gameover-replay {
+  display: none;
+  position: absolute;
+  width: 36vh;
+  height: 20vh;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.gameover-replay p {
+  font-size: 24px;
+  text-align: center;
+  padding: 20px 0;
+  color: white;
+  border: solid 2px white;
+  border-radius: 5px;
+}
+
+.gameover-replay.gameover {
+  display: block;
+}
+
 .grid-box {
   display: none;
   justify-content: space-between;
@@ -306,7 +329,7 @@ main h1 {
 }
 
 
-.add-highscore-form-container {
+.highscore-form-container {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -319,7 +342,7 @@ main h1 {
   padding: 20px 0;
 }
 
-.add-highscore-form-container input {
+.highscore-form-container input {
   display: block;
   height: 80px;
   width: 30%;
@@ -330,13 +353,13 @@ main h1 {
   border-radius: 5px;
 }
 
-.add-highscore-form-container h1 {
+.highscore-form-container h1 {
   font-size: 30px;
   line-height: 30px;
   margin: 10px auto;
 }
 
-.add-highscore-form-container button {
+.highscore-form-container button {
   display: block;
   font-size: 30px;
   border: solid 1px white;

@@ -10,7 +10,7 @@ if (process.env.DATABASE_URL) {
     logging: false
   })
 } else {
-  db = new Sequelize('postgres://localhost:5432/T3D')
+  db = new Sequelize('postgres://localhost:5432/T3D');
 }
 
-module.exports = db
+module.exports = db;
