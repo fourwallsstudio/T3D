@@ -96,7 +96,7 @@ const ThreeCanvas = props => {
     }
   }
 
-  return <div></div>;
+  return null;
 };
 
 

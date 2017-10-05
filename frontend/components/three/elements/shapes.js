@@ -9,7 +9,7 @@ export default class Shape {
     this.rotateIndex = 0
   }
 
-  createShape(material, deltas) {
+  createShape(material) {
     const geometry = new THREE.BoxGeometry(1, 1, 1)
 
     const cube1 = new THREE.Mesh(geometry, material)
