@@ -116,7 +116,10 @@ const iRotateDeltas =[
   [[-1, -1], [0, 0], [1, 1], [2, 2]],
 ]
 
-
+const aiIRotateDeltas = [
+  [1, 1, 1, 1],
+  [1]
+]
 
 const jDeltas =[[-1, 0], [0, 0], [1, 0], [1, -1]]
 
@@ -127,6 +130,12 @@ const jRotateDeltas =[
   [[-1, 1], [0, 0], [1, -1], [0, -2]],
 ]
 
+const aiJRotateDeltas = [
+  [1, 1, -1],
+  [1, 1],
+  [1, 1, 1],
+  [1, 3]
+]
 
 const lDeltas =[[-1, -1], [-1, 0], [0, 0], [1, 0]]
 
@@ -137,14 +146,21 @@ const lRotateDeltas =[
   [[-2, 0], [-1, 1], [0, 0], [1, -1]],
 ]
 
-
+const aiLRotateDeltas = [
+  [1, 2, 2],
+  [1, -2],
+  [1, 1, 1],
+  [1, 1]
+]
 
 
 const oDeltas =[[0, 0], [0, -1], [1, 0], [1, -1]]
 
 const oRotateDeltas =[[[0, 0], [0, 0], [0, 0], [0, 0]]]
 
-
+const aiORotateDeltas = [
+  [1, 1]
+]
 
 const sDeltas =[[-1, -1], [0, -1], [0, 0], [1, 0]]
 
@@ -153,7 +169,10 @@ const sRotateDeltas =[
   [[0, -2], [1, -1], [0, 0], [1, 1]]
 ]
 
-
+const aiSRotateDeltas = [
+  [1, 1, 2],
+  [1, -1]
+]
 
 const tDeltas =[[-1, 0], [0, 0], [0, -1], [1, 0]]
 
@@ -164,7 +183,12 @@ const tRotateDeltas =[
   [[-1, 1], [0, 0], [-1, -1], [1, -1]],
 ]
 
-
+const aiTRotateDeltas = [
+  [1, -1, 1],
+  [1, -1],
+  [1, 1, 1],
+  [1, 2]
+]
 
 const zDeltas =[[-1, 0], [0, 0], [0, -1], [1, -1]]
 
@@ -173,7 +197,10 @@ const zRotateDeltas =[
   [[-1, 1], [0, 0], [-1, -1], [0, -2]],
 ]
 
-
+const aiZRotateDeltas = [
+  [1, -1, -1],
+  [1, 2]
+]
 
 export const materials = [
   iMaterial,
@@ -213,4 +240,14 @@ export const rotateDeltas = [
   sRotateDeltas,
   tRotateDeltas,
   zRotateDeltas,
+]
+
+export const aiIRotateDeltas = [
+  aiIRotateDeltas,
+  aiJRotateDeltas,
+  aiLRotateDeltas,
+  aiORotateDeltas,
+  aiSRotateDeltas,
+  aiTRotateDeltas,
+  aiZRotateDeltas,
 ]

@@ -1,4 +1,4 @@
-import { materials, deltas, rotateDeltas } from '../../../util/shape_material_util'
+import { materials, deltas, rotateDeltas, aiRotateDeltas } from '../../../util/shape_material_util'
 const THREE = require('three');
 
 export default class Shape {
@@ -6,6 +6,7 @@ export default class Shape {
     this.cubes = this.createShape(materials[idx])
     this.deltas = deltas[idx]
     this.rotateDeltas = rotateDeltas[idx]
+    this.aiRotateDeltas = aiRotateDeltas[idx];
     this.rotateIndex = 0
   }
 
