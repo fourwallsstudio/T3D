@@ -42,7 +42,11 @@ const GameCanvas = props => {
     game.setUp(renderer)
   };
 
-  newGame();
+  if (props.aiMode) {
+    
+  } else {
+    newGame();
+  }
 
 
 

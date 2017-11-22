@@ -44,7 +44,7 @@ export default class Game {
   createNextShape() {
     if (this.nextShape) this.scene.removeShape(this.nextShape)
     const xPosition = this.levelStatus % 2 === 0 ? -13 : 13;
-    this.nextShapeIndex = Math.ceil(Math.random() * 6)
+    this.nextShapeIndex = Math.floor(Math.random() * 7)
 
     this.nextShape = new NextShape( this.nextShapeIndex )
     this.nextShape.putNextInPlayPosition(xPosition)
