@@ -242,7 +242,7 @@ export const rotateDeltas = [
   zRotateDeltas,
 ]
 
-export const aiIRotateDeltas = [
+export const aiRotateDeltas = [
   aiIRotateDeltas,
   aiJRotateDeltas,
   aiLRotateDeltas,

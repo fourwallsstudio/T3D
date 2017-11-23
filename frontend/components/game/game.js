@@ -3,6 +3,7 @@ import Shape from './elements/shapes'
 import { NextShape } from './elements/next_shape'
 import Scene from './elements/scene'
 import Camera from './elements/camera'
+import { aiGameMove } from '../../util/ai_util';
 const THREE = require('three')
 
 export default class Game {
@@ -24,11 +25,15 @@ export default class Game {
     this.cameraDelta = 0;
     this.rotateDisabled = false;
 
+    this.aiMode = false;
+    this.currentAiMove = null;
+
     this.updateGameStatus;
     this.updateScore;
     this.updateLevel;
 
     this.play = this.play.bind(this);
+    this.aiMakeMove = this.aiMakeMove.bind(this);
     this.rotateCamera = this.rotateCamera.bind(this);
     this.wipeGrid = this.wipeGrid.bind(this);
   }
@@ -66,10 +71,19 @@ export default class Game {
       return;
     }
 
+    if (this.aiMode) {
+      if (!this.currentAiMove) {
+        this.currentAiMove = aiGameMove(this);
+        this.boost = 0.3;
+        this.aiMakeMove();
+      }
+    }
+
     if (!this.shapeTouchBottom()) {
       this.currentShape.moveDown(this.speed, this.boost)
 
     } else {
+      this.currentAiMove = null;
 
       this.boost = 0;
       this.pause()
@@ -129,6 +143,23 @@ export default class Game {
   shapeTouchBottom() {
     return this.currentShape.cubes.some( c => this.stillShapes[c.position.x]
         .includes(Math.ceil(c.position.y) - 1))
+  }
+
+  aiMakeMove() {
+    const { rotations, xPosition } = this.currentAiMove;
+    for (let i = 0; i < rotations; i++) {
+      this.rotateShape();
+    }
+
+    if (xPosition < -1) {
+      for (let i = -1; i > xPosition; i--) {
+        this.moveShapeHorizontal('left');
+      }
+    } else {
+      for (let i = -1; i < xPosition; i++) {
+        this.moveShapeHorizontal('right');
+      }
+    }
   }
 
   moveShapeHorizontal(direction) {
@@ -259,7 +290,13 @@ export default class Game {
   }
 
   over() {
-    return this.stillShapes[0].includes(21) ? true : false;
+    let overTwentyOne = false;
+    [-1, 0, 1, 2].forEach(x => {
+      if (this.stillShapes[x].includes(22)) {
+        overTwentyOne = true;
+      }
+    })
+    return overTwentyOne;
   }
 
   wipeGrid() {

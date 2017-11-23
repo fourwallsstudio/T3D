@@ -1,27 +1,16 @@
-export const aiGameMove = (game) => {
-  let skyline = getSkyline(game.stillShapes);
-  let currentMaxWeight;
-  let rotations;
-  let xPosition;
 
-  game.currentShape.aiRotateDeltas.forEach((deltas, rotation) => {
+
+const aiGame = (game) => {
+  let skyline = [3, 3, 0, 2, 2, 2, 0, 1, 0, 4, 1, 3];
+  let weights = [];
+  game.currentShape.aiRotateDeltas.forEach(deltas => {
     const len = 12 - deltas.length + 1;
     for (let i = 0; i < len; i++) {
       const pos = calcPosition(deltas, i, skyline);
-      const weight = calcWeight(pos, i, skyline)
-
-      if (!currentMaxWeight || weight > currentMaxWeight) {
-        currentMaxWeight = weight;
-        rotations = rotation;
-        xPosition = i;
-      }
+      weights.push(calcWeight(pos, i, skyline));
     }
   })
-
-  return {
-    rotations,
-    xPosition: xPosition - 5,
-  };
+  console.log('weights', weights);
 }
 
 const getSkyline = (stillShapes) => {
@@ -54,6 +43,7 @@ const validMove = (pos, skyline, idx) => {
 }
 
 const calcWeight = (pos, idx, skyline) => {
+  console.log('pos', pos, 'idx', idx);
   let weight = 0;
   pos.forEach((p, i) => {
     const diff = p - skyline[idx + i];
@@ -65,3 +55,7 @@ const calcWeight = (pos, idx, skyline) => {
   })
   return weight;
 }
+
+
+
+export default aiGame;

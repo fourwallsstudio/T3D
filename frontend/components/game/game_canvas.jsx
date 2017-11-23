@@ -42,13 +42,8 @@ const GameCanvas = props => {
     game.setUp(renderer)
   };
 
-  if (props.aiMode) {
-    
-  } else {
-    newGame();
-  }
-
-
+  newGame();
+  if (props.aiMode) game.aiMode = true;
 
   // USER CONTROLS
 
@@ -113,6 +108,7 @@ const GameCanvas = props => {
 
 const mapStateToProps = state => {
   return {
+    aiMode: true,
   }
 }
 
