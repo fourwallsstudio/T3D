@@ -74,7 +74,7 @@ export default class Game {
     if (this.aiMode) {
       if (!this.currentAiMove) {
         this.currentAiMove = aiGameMove(this);
-        this.boost = 0.3;
+        this.boost = 0.5;
         this.aiMakeMove();
       }
     }
@@ -112,7 +112,10 @@ export default class Game {
       this.stillShapes[cube.position.x].push( cube.position.y )
     })
 
-    if (!this.rotateDisabled && this.totalShapes % 10 === 0) {
+    if (!this.aiMode
+      && !this.rotateDisabled
+      && this.totalShapes % 10 === 0) {
+
       this.nextLevel()
 
     } else {
@@ -146,17 +149,15 @@ export default class Game {
   }
 
   aiMakeMove() {
-    const { rotations, xPosition } = this.currentAiMove;
+    const { rotations, positionX } = this.currentAiMove;
     for (let i = 0; i < rotations; i++) {
       this.rotateShape();
     }
 
-    if (xPosition < -1) {
-      for (let i = -1; i > xPosition; i--) {
+    while (this.currentShape.mostLeft() !== positionX) {
+      if (positionX < this.currentShape.mostLeft()) {
         this.moveShapeHorizontal('left');
-      }
-    } else {
-      for (let i = -1; i < xPosition; i++) {
+      } else if (positionX > this.currentShape.mostLeft()){
         this.moveShapeHorizontal('right');
       }
     }
@@ -291,7 +292,7 @@ export default class Game {
 
   over() {
     let overTwentyOne = false;
-    [-1, 0, 1, 2].forEach(x => {
+    Object.keys(this.stillShapes).forEach(x => {
       if (this.stillShapes[x].includes(22)) {
         overTwentyOne = true;
       }

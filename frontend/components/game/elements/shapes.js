@@ -93,4 +93,12 @@ export default class Shape {
 
     return true;
   }
+
+  mostLeft() {
+    let x = null;
+    this.cubes.forEach(c => {
+      if (x === null || c.position.x < x) x = c.position.x;
+    })
+    return x;
+  }
 }

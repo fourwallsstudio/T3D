@@ -153,8 +153,7 @@ const aiLRotateDeltas = [
   [1, 1]
 ]
 
-
-const oDeltas =[[0, 0], [0, -1], [1, 0], [1, -1]]
+const oDeltas =[[-1, 0], [-1, -1], [0, 0], [0, -1]]
 
 const oRotateDeltas =[[[0, 0], [0, 0], [0, 0], [0, 0]]]
 
