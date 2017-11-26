@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 // ACTIONS
-import { updateGrid, updateGameStatus, updateScore } from '../../actions/game_actions';
+import { updateGrid, updateGameStatus, updateScore, toggleAiMode } from '../../actions/game_actions';
 import { fetchHighScores, createHighScore } from '../../actions/highscore_actions';
 
 // COMPONENTS
@@ -34,6 +34,7 @@ class Displays extends React.Component {
 
     this.handleClick = this.handleClick.bind(this);
     this.handleHSToggle = this.handleHSToggle.bind(this);
+    this.handleAiModeToggle = this.handleAiModeToggle.bind(this);
     this.disableHighScoreForm = this.disableHighScoreForm.bind(this);
   }
 
@@ -63,6 +64,10 @@ class Displays extends React.Component {
 
   handleHSToggle() {
     this.setState({ highScoreDisplay: !this.state.highScoreDisplay });
+  }
+
+  handleAiModeToggle() {
+    this.props.toggleAiMode();
   }
 
   disableHighScoreForm() {
@@ -130,7 +135,7 @@ class Displays extends React.Component {
         </div>
 
         { highScoreDisplay }
-        { highScoreForm }
+        {  }
 
         <div className={"grid-box" + gridActive}>
           <div className="grid"></div>
@@ -175,6 +180,10 @@ class Displays extends React.Component {
           <h1>HS</h1>
         </div>
 
+        <div className={"ai-mode-display-toggle" + rotate} onClick={ this.handleAiModeToggle }>
+          <img  src="assets/computer1.png" />
+        </div>
+
         <ContactInfo />
 
       </section>
@@ -201,6 +210,7 @@ const mapDispatchToProps = dispatch => {
     createHighScore: hs => dispatch(createHighScore(hs)),
     updateGameStatus: status => dispatch(updateGameStatus(status)),
     updateScore: score => dispatch(updateScore(score)),
+    toggleAiMode: () => dispatch(toggleAiMode()),
   }
 }
 

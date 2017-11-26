@@ -1,31 +1,37 @@
-import { materials, deltas, rotateDeltas, aiRotateDeltas } from '../../../util/shape_material_util'
+const { deltas, rotateDeltas, aiRotateDeltas } = require('../frontend/util/shape_material_util');
 const THREE = require('three');
 
-export default class Shape {
+class Cube {
+  constructor() {
+    this.position = {
+      x: 0,
+      y: 0,
+      set: function(dX, dY) {
+        this.x = dX;
+        this.y = dY;
+      }
+    }
+  }
+}
+
+class Shape {
   constructor(idx) {
     this.idx = idx;
-    this.cubes = this.createShape(materials[idx])
+    this.cubes = this.createShape()
     this.deltas = deltas[idx]
     this.rotateDeltas = rotateDeltas[idx]
     this.aiRotateDeltas = aiRotateDeltas[idx];
     this.rotateIndex = 0
   }
 
-  createShape(material) {
-    const geometry = new THREE.BoxGeometry(1, 1, 1)
-
-    const cube1 = new THREE.Mesh(geometry, material)
-    const cube2 = new THREE.Mesh(geometry, material)
-    const cube3 = new THREE.Mesh(geometry, material)
-    const cube4 = new THREE.Mesh(geometry, material)
-
-    return [ cube1, cube2, cube3, cube4 ]
+  createShape() {
+    return [ new Cube(), new Cube(), new Cube(), new Cube() ]
   }
 
   putInPlayPosition() {
     this.cubes.forEach( (c, i) => {
       let d = this.deltas[i]
-      c.position.set(d[0], 24 + d[1], 0);
+      c.position.set(d[0], 24 + d[1]);
     })
     return this
   }
@@ -33,13 +39,13 @@ export default class Shape {
   putNextInPlayPosition(xPosition) {
     this.cubes.forEach( (c, i) => {
       let d = this.deltas[i]
-      c.position.set(xPosition + d[0], 22 + d[1], 0);
+      c.position.set(xPosition + d[0], 22 + d[1]);
     })
     return this
   }
 
-  moveDown(speed, boost) {
-    this.cubes.forEach( cube => cube.position.y -= speed + boost )
+  moveDown() {
+    this.cubes.forEach( cube => cube.position.y -= 1 )
   }
 
   moveHorizontal(direction, stillShapes) {
@@ -103,3 +109,5 @@ export default class Shape {
     return x;
   }
 }
+
+module.exports = Shape;

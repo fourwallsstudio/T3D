@@ -131,7 +131,7 @@ const jRotateDeltas =[
 ]
 
 const aiJRotateDeltas = [
-  [1, 1, -1],
+  [1, 1, 0],
   [1, 1],
   [1, 1, 1],
   [1, 3]
@@ -148,7 +148,7 @@ const lRotateDeltas =[
 
 const aiLRotateDeltas = [
   [1, 2, 2],
-  [1, -2],
+  [1, -1],
   [1, 1, 1],
   [1, 1]
 ]
@@ -170,7 +170,7 @@ const sRotateDeltas =[
 
 const aiSRotateDeltas = [
   [1, 1, 2],
-  [1, -1]
+  [1, 0]
 ]
 
 const tDeltas =[[-1, 0], [0, 0], [0, -1], [1, 0]]
@@ -183,8 +183,8 @@ const tRotateDeltas =[
 ]
 
 const aiTRotateDeltas = [
-  [1, -1, 1],
-  [1, -1],
+  [1, 0, 1],
+  [1, 0],
   [1, 1, 1],
   [1, 2]
 ]
@@ -197,11 +197,11 @@ const zRotateDeltas =[
 ]
 
 const aiZRotateDeltas = [
-  [1, -1, -1],
+  [1, 0, 0],
   [1, 2]
 ]
 
-export const materials = [
+const materials = [
   iMaterial,
   jMaterial,
   lMaterial,
@@ -211,7 +211,7 @@ export const materials = [
   zMaterial,
 ]
 
-export const transparentMaterials = [
+const transparentMaterials = [
   iTransparentMaterial,
   jTransparentMaterial,
   lTransparentMaterial,
@@ -221,7 +221,7 @@ export const transparentMaterials = [
   zTransparentMaterial,
 ]
 
-export const deltas = [
+const deltas = [
   iDeltas,
   jDeltas,
   lDeltas,
@@ -231,7 +231,7 @@ export const deltas = [
   zDeltas,
 ]
 
-export const rotateDeltas = [
+const rotateDeltas = [
   iRotateDeltas,
   jRotateDeltas,
   lRotateDeltas,
@@ -241,7 +241,7 @@ export const rotateDeltas = [
   zRotateDeltas,
 ]
 
-export const aiRotateDeltas = [
+const aiRotateDeltas = [
   aiIRotateDeltas,
   aiJRotateDeltas,
   aiLRotateDeltas,
@@ -250,3 +250,11 @@ export const aiRotateDeltas = [
   aiTRotateDeltas,
   aiZRotateDeltas,
 ]
+
+module.exports = {
+  materials,
+  transparentMaterials,
+  deltas,
+  rotateDeltas,
+  aiRotateDeltas
+}

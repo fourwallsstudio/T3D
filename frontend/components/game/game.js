@@ -3,8 +3,8 @@ import Shape from './elements/shapes'
 import { NextShape } from './elements/next_shape'
 import Scene from './elements/scene'
 import Camera from './elements/camera'
-import { aiGameMove } from '../../util/ai_util';
-const THREE = require('three')
+const { aiGameMove } = require('../../util/ai_util');
+const THREE = require('three');
 
 export default class Game {
   constructor() {
@@ -17,13 +17,15 @@ export default class Game {
     this.currentShape;
     this.nextShape;
     this.nextShapeIndex = 0;
+    this.nextShapeRandom = true;
     this.levelStatus = 1;
     this.score = 0;
     this.speed = 0.05;
     this.boost = 0;
     this.aniFrame;
     this.cameraDelta = 0;
-    this.rotateDisabled = false;
+    this.rotateDisabled = true;
+    this.isPaused = true;
 
     this.aiMode = false;
     this.currentAiMove = null;
@@ -49,7 +51,13 @@ export default class Game {
   createNextShape() {
     if (this.nextShape) this.scene.removeShape(this.nextShape)
     const xPosition = this.levelStatus % 2 === 0 ? -13 : 13;
-    this.nextShapeIndex = Math.floor(Math.random() * 7)
+
+    if (this.nextShapeRandom) {
+      this.nextShapeIndex = Math.floor(Math.random() * 7)
+    } else {
+      this.nextShapeIndex = (this.nextShapeIndex + 1) % 7
+    }
+
 
     this.nextShape = new NextShape( this.nextShapeIndex )
     this.nextShape.putNextInPlayPosition(xPosition)
@@ -74,7 +82,7 @@ export default class Game {
     if (this.aiMode) {
       if (!this.currentAiMove) {
         this.currentAiMove = aiGameMove(this);
-        this.boost = 0.5;
+        this.boost = 0.7;
         this.aiMakeMove();
       }
     }

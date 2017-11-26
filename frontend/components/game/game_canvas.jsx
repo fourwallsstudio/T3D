@@ -14,23 +14,18 @@ import {
   disableGrid
 } from '../../actions/game_actions'
 
-
-
-
 const GameCanvas = props => {
 
-  let game = null;
-  let renderer;
-  let isPaused;
+  // let isPaused;
 
-  const newGame = () => {
-    game = new Game;
-    game.updateGameStatus = props.updateGameStatus;
-    game.updateScore = props.updateScore;
-    game.updateLevel = props.updateLevel;
-    game.disableGrid = props.disableGrid;
+  const createNewGame = () => {
+    const newGame = new Game;
+    newGame.updateGameStatus = props.updateGameStatus;
+    newGame.updateScore = props.updateScore;
+    newGame.updateLevel = props.updateLevel;
+    newGame.disableGrid = props.disableGrid;
 
-    renderer = new THREE.WebGLRenderer(
+    const renderer = new THREE.WebGLRenderer(
       {
         canvas: document.getElementById("myCanvas"),
         alpha: true,
@@ -38,12 +33,18 @@ const GameCanvas = props => {
     );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-    isPaused = true;
-    game.setUp(renderer)
+    // newGame.isPaused = true;
+    newGame.setUp(renderer)
+
+    return newGame;
   };
 
-  newGame();
-  if (props.aiMode) game.aiMode = true;
+
+  let game = createNewGame();
+
+  if (props.aiMode) {
+    game.aiMode = true;
+  }
 
   // USER CONTROLS
 
@@ -73,7 +74,7 @@ const GameCanvas = props => {
       case "r":
         game.pause()
         game.wipeGrid()
-        newGame()
+        game = createNewGame()
         playPauseToggle()
         break
 
@@ -88,16 +89,16 @@ const GameCanvas = props => {
   })
 
   const playPauseToggle = () => {
-    if (isPaused) {
+    if (game.isPaused) {
 
       game.play()
-      isPaused = !isPaused
+      game.isPaused = !game.isPaused
       props.updateGameStatus('playing')
 
     } else {
 
       game.pause()
-      isPaused = !isPaused
+      game.isPaused = !game.isPaused
       props.updateGameStatus('paused')
     }
   }
@@ -108,7 +109,7 @@ const GameCanvas = props => {
 
 const mapStateToProps = state => {
   return {
-    aiMode: true,
+    aiMode: state.game.aiMode,
   }
 }
 

@@ -2,6 +2,7 @@ export const UPDATE_SCORE = 'UPDATE_SCORE';
 export const UPDATE_LEVEL = 'UPDATE_LEVEL';
 export const UPDATE_GAME_STATUS = 'UPDATE_GAME_STATUS';
 export const DISABLE_GRID = 'DISABLE_GRID';
+export const TOGGLE_AI_MODE = 'TOGGLE_AI_MODE';
 
 
 export const updateScore = score => {
@@ -28,5 +29,11 @@ export const updateGameStatus = status => {
 export const disableGrid = () => {
   return {
     type: DISABLE_GRID
+  }
+}
+
+export const toggleAiMode = () => {
+  return {
+    type: TOGGLE_AI_MODE
   }
 }
