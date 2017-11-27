@@ -135,7 +135,7 @@ class Displays extends React.Component {
         </div>
 
         { highScoreDisplay }
-        {  }
+        { highScoreForm }
 
         <div className={"grid-box" + gridActive}>
           <div className="grid"></div>

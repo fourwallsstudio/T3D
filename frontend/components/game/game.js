@@ -7,10 +7,8 @@ const { aiGameMove } = require('../../util/ai_util');
 const THREE = require('three');
 
 export default class Game {
-  constructor() {
-    this.scene = new Scene;
-    this.camera = new Camera;
-    this.renderer;
+  constructor(scene, gridOpts) {
+    this.scene = scene || null;
     this.allCubes = GameUtil.allCubes();
     this.stillShapes = GameUtil.stillShapes();
     this.totalShapes = 0;
@@ -23,23 +21,34 @@ export default class Game {
     this.speed = 0.05;
     this.boost = 0;
     this.aniFrame;
-    this.cameraDelta = 0;
-    this.rotateDisabled = true;
+    // this.cameraDelta = 0;
+    // this.rotateDisabled = true;
     this.isPaused = true;
+    this.inProgress = false;
 
     this.aiMode = false;
     this.currentAiMove = null;
 
+    // redux actions
     this.updateGameStatus;
     this.updateScore;
     this.updateLevel;
+    this.toggleAiMode;
 
     this.play = this.play.bind(this);
     this.aiMakeMove = this.aiMakeMove.bind(this);
-    this.rotateCamera = this.rotateCamera.bind(this);
+    // this.rotateCamera = this.rotateCamera.bind(this);
     this.wipeGrid = this.wipeGrid.bind(this);
   }
 
+  setUp() {
+    if (this.nextShapeRandom) {
+      this.nextShapeIndex = Math.floor(Math.random() * 7);
+    }
+    this.newShape()
+    this.createNextShape()
+    this.inProgress = true;
+  }
 
   newShape() {
     this.currentShape = new Shape(this.nextShapeIndex)
@@ -62,14 +71,6 @@ export default class Game {
     this.nextShape = new NextShape( this.nextShapeIndex )
     this.nextShape.putNextInPlayPosition(xPosition)
     this.scene.addShape(this.nextShape)
-  }
-
-  setUp(renderer) {
-    this.renderer = renderer;
-    this.newShape()
-    this.createNextShape()
-    this.updateScore(this.score);
-    this.updateLevel(this.levelStatus);
   }
 
   play() {
@@ -99,8 +100,7 @@ export default class Game {
       return;
     }
 
-    this.aniFrame = requestAnimationFrame( this.play )
-    this.renderer.render( this.scene.scene, this.camera.camera )
+    this.aniFrame = requestAnimationFrame( this.play );
   }
 
   pause() {
@@ -109,6 +109,7 @@ export default class Game {
   }
 
   endGame() {
+    if (this.aiMode) this.toggleAiMode();
     this.updateGameStatus("gameover")
   }
 
@@ -121,16 +122,15 @@ export default class Game {
     })
 
     if (!this.aiMode
-      && !this.rotateDisabled
+      // && !this.rotateDisabled
       && this.totalShapes % 10 === 0) {
 
       this.nextLevel()
-
-    } else {
-      this.newShape()
-      this.createNextShape()
-      this.play()
     }
+
+    this.newShape()
+    this.createNextShape()
+    this.play()
 
     if (this.completeRows().length > 0) {
       const rows = this.completeRows();
@@ -142,9 +142,9 @@ export default class Game {
   nextLevel() {
     this.levelStatus += 1;
     this.speed += 0.01;
-    this.updateLevel(this.levelStatus)
     this.scene.removeShape(this.nextShape)
-    this.rotateCamera()
+    this.updateLevel(this.levelStatus)
+    // this.rotateCamera()
   }
 
   resetSpeed() {
@@ -257,46 +257,41 @@ export default class Game {
     })
   }
 
-  rotateCamera() {
-    const evenLevel = this.levelStatus % 2 === 0;
-    const rotating = evenLevel
-                      ? Math.sin(this.cameraDelta) >= 0
-                      : Math.sin(this.cameraDelta) <= 0;
-    const vectorX = evenLevel ? 0.5 : -0.5;
-    const setZ = evenLevel ? -13 : 13;
+  // rotateCamera() {
+  //   const evenLevel = this.levelStatus % 2 === 0;
+  //   const rotating = evenLevel
+  //                     ? Math.sin(this.cameraDelta) >= 0
+  //                     : Math.sin(this.cameraDelta) <= 0;
+  //   const vectorX = evenLevel ? 0.5 : -0.5;
+  //   const setZ = evenLevel ? -13 : 13;
+  //
+  //   if (rotating) {
+  //
+  //     this.cameraDelta += 0.05;
+  //     this.camera.camera.lookAt( new THREE.Vector3(vectorX, 12, 0) )
+  //     this.camera.camera.position.y = 12;
+  //     this.camera.camera.position.x = Math.sin(this.cameraDelta) * 13;
+  //     this.camera.camera.position.z = Math.cos(this.cameraDelta) * 13;
+  //
+  //   } else {
+  //
+  //     this.camera.camera.position.set(0.5, 12, setZ)
+  //     this.camera.camera.lookAt( new THREE.Vector3(0.5, 12, 0) )
+  //     this.stopRotate()
+  //     return;
+  //   }
+  //
+  //   this.aniFrame = requestAnimationFrame(this.rotateCamera)
+  //   this.renderer.render(this.scene.scene, this.camera.camera)
+  // }
 
-    if (rotating) {
-
-      this.cameraDelta += 0.05;
-      this.camera.camera.lookAt( new THREE.Vector3(vectorX, 12, 0) )
-      this.camera.camera.position.y = 12;
-      this.camera.camera.position.x = Math.sin(this.cameraDelta) * 13;
-      this.camera.camera.position.z = Math.cos(this.cameraDelta) * 13;
-
-    } else {
-
-      this.camera.camera.position.set(0.5, 12, setZ)
-      this.camera.camera.lookAt( new THREE.Vector3(0.5, 12, 0) )
-      this.stopRotate()
-      return;
-    }
-
-    this.aniFrame = requestAnimationFrame(this.rotateCamera)
-    this.renderer.render(this.scene.scene, this.camera.camera)
-  }
-
-  stopRotate() {
-    cancelAnimationFrame(this.aniFrame)
-    this.aniFrame = undefined;
-    this.newShape()
-    this.createNextShape()
-    this.play()
-  }
-
-  toggleCameraView() {
-    this.rotateDisabled = !this.rotateDisabled
-    this.camera.toggleView()
-  }
+  // stopRotate() {
+  //   cancelAnimationFrame(this.aniFrame)
+  //   this.aniFrame = undefined;
+  //   this.newShape()
+  //   this.createNextShape()
+  //   this.play()
+  // }
 
   over() {
     let overTwentyOne = false;
@@ -309,9 +304,7 @@ export default class Game {
   }
 
   wipeGrid() {
-    this.scene = new Scene;
-    this.camera = new Camera;
-    this.renderer = null;
+    this.scene = null;
     this.allCubes = GameUtil.allCubes();
     this.stillShapes = GameUtil.stillShapes();
     this.totalShapes = 0;
@@ -323,7 +316,5 @@ export default class Game {
     this.speed = 0.05;
     this.boost = 0;
     this.aniFrame = null;
-    this.cameraDelta = 0;
-    this.rotateDisabled = false;
   }
 }

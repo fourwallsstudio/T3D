@@ -2,7 +2,7 @@ import {
   UPDATE_SCORE,
   UPDATE_LEVEL,
   UPDATE_GAME_STATUS,
-  DISABLE_GRID,
+  TOGGLE_DISABLE_GRID,
   TOGGLE_AI_MODE
 } from '../actions/game_actions';
 import { merge } from 'lodash';
@@ -29,7 +29,7 @@ const gameReducer = (state = defaultState, action) => {
     case UPDATE_GAME_STATUS:
       return merge({}, state, { gameStatus: action.status });
 
-    case DISABLE_GRID:
+    case TOGGLE_DISABLE_GRID:
       let grid = !state.gridDisable
       return merge({}, state, { gridDisable: grid });
 
