@@ -74,22 +74,22 @@ MongoClient.connect(uri, function(err, db) {
 
   const tThreeDB = db.collection('ai_results');
 
-  // _.forEach(_.range(0, 10, 1), () => {
-  //   const data = playGame();
-  //
-  //   tThreeDB.insertOne(data, function(err, result) {
-  //     if (err) {
-  //       console.log('err: ', err)
-  //     } else {
-  //       console.log('success: ', result);
-  //     }
-  //   })
-  // })
+  _.forEach(_.range(0, 10, 1), () => {
+    const data = playGame();
 
-  const avgScore = tThreeDB.aggregate({ $match: { "weightOptions.accountForGapsOnCompleteRows": true, "weightOptions.values.heightExp": { $eq: 1 } }}, { $group: { _id: null, avg_score: { $avg : "$score"} }});
-  avgScore.each(function(err, doc) {
-    console.log(doc.score);
+    tThreeDB.insertOne(data, function(err, result) {
+      if (err) {
+        console.log('err: ', err)
+      } else {
+        console.log('success: ', result);
+      }
+    })
   })
+
+  // const avgScore = tThreeDB.aggregate({ $match: { "weightOptions.accountForGapsOnCompleteRows": true, "weightOptions.values.heightExp": { $eq: 1 } }}, { $group: { _id: null, avg_score: { $avg : "$score"} }});
+  // avgScore.each(function(err, doc) {
+  //   console.log(doc.score);
+  // })
 
   db.close();
 });

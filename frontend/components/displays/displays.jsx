@@ -47,11 +47,14 @@ class Displays extends React.Component {
       this.setState({ gridDisable: nextProps.gridDisable });
     }
 
-    if (nextProps.gameStatus === 'gameover'
+    if (nextProps.gameStatus !== this.props.gameStatus) {
+      if (!nextProps.aiMode
+        && nextProps.gameStatus === 'gameover'
         && (nextProps.highscores.length === 0
-        || nextProps.highscores[nextProps.highscores.length - 1].score <= nextProps.score)) {
+          || nextProps.highscores[nextProps.highscores.length - 1].score <= nextProps.score)) {
 
-        this.setState({ highScoreFormActive: true })
+            this.setState({ highScoreFormActive: true })
+          }
     }
   }
 
@@ -192,12 +195,11 @@ class Displays extends React.Component {
 
 }
 
-
-
 const mapStateToProps = ({ game, highscores }) => {
   return {
     score: game.score,
     level: game.level,
+    aiMode: game.aiMode,
     gameStatus: game.gameStatus,
     gridDisable: game.gridDisable,
     highscores,

@@ -10,11 +10,12 @@ const weightOptions = {
   accountForGapsOnCompleteRows: true,
   values: {
     row: 100,
-    connection: 100,
+    connection: 15,
     gap: 100,
     height: 50,
     heightExp: 1,
-    shapeHeightExp: 3,
+    shapeHeight: 10,
+    shapeHeightExp: 1,
   }
 }
 
@@ -126,12 +127,12 @@ const calcWeight = (posX, yDeltas, rotation, skyline, game, opts) => {
   }
 
   if (opts.calcHeight) {
-    weights['heightWeight'] -= Math.pow(lowestCube[1], opts.values.heightExp) * opts.values.height;
+    weights['heightWeight'] -= Math.pow(lowestCube[1] + 1, opts.values.heightExp) * opts.values.height;
   }
 
   if (opts.calcShapeHeight) {
     const shapeHeight = getShapeHeight(cubePositions, lowestCube);
-    weights['shapeHeight'] -= Math.pow(shapeHeight, opts.values.shapeHeightExp)
+    weights['shapeHeight'] += shapeHeight * opts.values.shapeHeight;
   }
 
   return weights;

@@ -7,15 +7,16 @@ const weightOptions = {
   calcConnections: false,
   calcGaps: true,
   calcHeight: true,
-  calcShapeHeight: false,
-  accountForGapsOnCompleteRows: false,
+  calcShapeHeight: true,
+  accountForGapsOnCompleteRows: true,
   values: {
     row: 100,
-    connection: 100,
+    connection: 15,
     gap: 100,
     height: 50,
     heightExp: 1,
-    shapeHeightExp: 3,
+    shapeHeight: 10,
+    shapeHeightExp: 1,
   }
 }
 
