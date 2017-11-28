@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 // ACTIONS
-import { updateGrid, updateGameStatus, updateScore } from '../../actions/game_actions';
+import { updateGrid, updateGameStatus, updateScore, toggleAiMode } from '../../actions/game_actions';
 import { fetchHighScores, createHighScore } from '../../actions/highscore_actions';
 
 // COMPONENTS
@@ -34,6 +34,7 @@ class Displays extends React.Component {
 
     this.handleClick = this.handleClick.bind(this);
     this.handleHSToggle = this.handleHSToggle.bind(this);
+    this.handleAiModeToggle = this.handleAiModeToggle.bind(this);
     this.disableHighScoreForm = this.disableHighScoreForm.bind(this);
   }
 
@@ -46,11 +47,14 @@ class Displays extends React.Component {
       this.setState({ gridDisable: nextProps.gridDisable });
     }
 
-    if (nextProps.gameStatus === 'gameover'
+    if (nextProps.gameStatus !== this.props.gameStatus) {
+      if (!nextProps.aiMode
+        && nextProps.gameStatus === 'gameover'
         && (nextProps.highscores.length === 0
-        || nextProps.highscores[nextProps.highscores.length - 1].score <= nextProps.score)) {
+          || nextProps.highscores[nextProps.highscores.length - 1].score <= nextProps.score)) {
 
-        this.setState({ highScoreFormActive: true })
+            this.setState({ highScoreFormActive: true })
+          }
     }
   }
 
@@ -63,6 +67,10 @@ class Displays extends React.Component {
 
   handleHSToggle() {
     this.setState({ highScoreDisplay: !this.state.highScoreDisplay });
+  }
+
+  handleAiModeToggle() {
+    this.props.toggleAiMode();
   }
 
   disableHighScoreForm() {
@@ -175,6 +183,10 @@ class Displays extends React.Component {
           <h1>HS</h1>
         </div>
 
+        <div className={"ai-mode-display-toggle" + rotate} onClick={ this.handleAiModeToggle }>
+          <img  src="assets/computer1.png" />
+        </div>
+
         <ContactInfo />
 
       </section>
@@ -183,12 +195,11 @@ class Displays extends React.Component {
 
 }
 
-
-
 const mapStateToProps = ({ game, highscores }) => {
   return {
     score: game.score,
     level: game.level,
+    aiMode: game.aiMode,
     gameStatus: game.gameStatus,
     gridDisable: game.gridDisable,
     highscores,
@@ -201,6 +212,7 @@ const mapDispatchToProps = dispatch => {
     createHighScore: hs => dispatch(createHighScore(hs)),
     updateGameStatus: status => dispatch(updateGameStatus(status)),
     updateScore: score => dispatch(updateScore(score)),
+    toggleAiMode: () => dispatch(toggleAiMode()),
   }
 }
 

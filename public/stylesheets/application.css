@@ -77,7 +77,8 @@ main h1 {
 .angellist-img:hover,
 .linkedin-img:hover,
 .highscore-display-container:hover,
-.highscore-display-toggle:hover {
+.highscore-display-toggle:hover,
+.ai-mode-display-toggle:hover {
   opacity: 0.8;
   -moz-transform: scaleX(-1);
   -o-transform: scaleX(-1);
@@ -412,4 +413,16 @@ main h1 {
 
 .highscore-display-toggle h1 {
   font-size: 20px;
+}
+
+.ai-mode-display-toggle {
+  position: absolute;
+  bottom: 5%;
+  left: 100px;
+  width: 40px;
+  height: 40px;
+}
+
+.ai-mode-display-toggle:hover {
+  cursor: pointer;
 }

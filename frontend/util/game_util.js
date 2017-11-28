@@ -9,7 +9,7 @@ export const allCubes = () => ({
   '12': [], '13': [], '14': [], '15': [],
   '16': [], '17': [], '18': [], '19': [],
   '20': [], '21': [], '22': [], '23': [],
-  '24': []
+  '24': [], '25': [], '26': [], '27': [],
 });
 
 export const stillShapes = () => ({
@@ -29,49 +29,6 @@ export const stillShapes = () => ({
 
 
 export let score = 0;
-
-
-// ACTIONS
-
-// export const level = lvl => {
-//   switch (lvl.toString()) {
-//
-//     case '0':
-//     levelStatus = 1;
-//     return 0.05;
-//     break;
-//
-//     case '1':
-//     levelStatus = 2;
-//     return 0.08;
-//     break;
-//
-//     case '2':
-//     levelStatus = 3;
-//     return 0.1;
-//     break;
-//
-//     case '3':
-//     levelStatus = 4;
-//     return 0.12;
-//     break;
-//
-//     case '4':
-//     levelStatus = 5;
-//     return 0.15;
-//     break;
-//
-//     case '5':
-//     levelStatus = 6;
-//     return 0.18
-//     break;
-//
-//     default:
-//     levelStatus = 7;
-//     return 0.2;
-//   }
-//
-// }
 
 export const levelSpeed = {
   1: 0.05, 2: 0.08, 3: 0.1, 4: 0.12, 5: 0.15, 6: 0.18, 7: 0.2

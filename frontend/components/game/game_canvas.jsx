@@ -4,111 +4,141 @@ import { connect } from 'react-redux'
 import Game from './game'
 import Scene from './elements/scene'
 import Camera from './elements/camera'
-const THREE = require('three')
+const THREE = require('three');
 
 // ACTIONS
 import {
   updateScore,
   updateLevel,
   updateGameStatus,
-  disableGrid
+  toggleDisableGrid,
+  toggleAiMode,
 } from '../../actions/game_actions'
 
+class GameCanvas extends React.Component {
+  constructor(props) {
+    super(props);
 
+    this.renderer = null;
+    this.gameCamera = null;
+    this.gameScene = null;
+    this.game = null;
+    this.aniFrame;
+  }
 
+  componentDidMount() {
+    this.setUpThreeRender();
+    this.createNewGame();
+    this.animate();
+    this.setUpKeyEvents();
+  }
 
-const GameCanvas = props => {
+  componentDidUpdate(prevProps) {
+    if (prevProps.aiMode !== this.props.aiMode) {
+      if (this.props.aiMode) {
+        this.createNewGame(this.props.aiMode);
+        this.game.setUp();
+        this.game.togglePlayPause();
+      }
+    }
 
-  let game = null;
-  let renderer;
-  let isPaused;
+    if (prevProps.level !== this.props.level && this.props.level !== 1) {
+      if (!this.gameCamera.rotateDisabled) {
+        this.game.isPaused = true;
+        this.gameCamera.rotateCamera();
+      }
+    }
+  }
 
-  const newGame = () => {
-    game = new Game;
-    game.updateGameStatus = props.updateGameStatus;
-    game.updateScore = props.updateScore;
-    game.updateLevel = props.updateLevel;
-    game.disableGrid = props.disableGrid;
-
-    renderer = new THREE.WebGLRenderer(
+  setUpThreeRender = () => {
+    const renderer = new THREE.WebGLRenderer(
       {
         canvas: document.getElementById("myCanvas"),
         alpha: true,
       }
     );
     renderer.setSize( window.innerWidth, window.innerHeight );
+    this.renderer = renderer;
+  }
 
-    isPaused = true;
-    game.setUp(renderer)
-  };
+  animate = () => {
+    this.aniFrame = requestAnimationFrame( this.animate )
+    this.renderer.render( this.gameScene.scene, this.gameCamera.camera )
+  }
 
-  newGame();
+  setUpKeyEvents = () => {
+    document.addEventListener("keypress", function(e) {
+      this.handleKeyEvent(e);
+    }.bind(this))
+  }
 
-
-
-  // USER CONTROLS
-
-  document.addEventListener("keypress", function(e) {
+  handleKeyEvent = (e) => {
     switch(e.key) {
 
       case "w":
-        game.rotateShape()
-        break
+        this.game.rotateShape()
+        break;
 
       case "s":
-        game.boost = 0.3;
-        break
+        this.game.enableBoost();
+        break;
 
       case "a":
-        game.moveShapeHorizontal('left')
-        break
+        this.game.moveShapeHorizontal('left')
+        break;
 
       case "d":
-        game.moveShapeHorizontal('right')
-        break
+        this.game.moveShapeHorizontal('right')
+        break;
 
       case "p":
-        playPauseToggle()
-        break
+        this.game.togglePlayPause()
+        break;
 
       case "r":
-        game.pause()
-        game.wipeGrid()
-        newGame()
-        playPauseToggle()
-        break
+        this.createNewGame()
+        this.props.updateGameStatus('welcome')
+        break;
 
       case "v":
-        game.toggleCameraView()
-        props.disableGrid()
-        break
+        this.gameCamera.toggleView();
+        this.props.toggleDisableGrid();
+        break;
 
       default:
         return
     }
-  })
-
-  const playPauseToggle = () => {
-    if (isPaused) {
-
-      game.play()
-      isPaused = !isPaused
-      props.updateGameStatus('playing')
-
-    } else {
-
-      game.pause()
-      isPaused = !isPaused
-      props.updateGameStatus('paused')
-    }
   }
 
-  return null;
+  createNewGame = (aiMode = false) => {
+    if (this.game) this.game.pause();
+    const gameScene = new Scene();
+    const gameCamera = new Camera();
+    const newGame = new Game(gameScene);
+    newGame.updateScore = this.props.updateScore;
+    newGame.updateLevel = this.props.updateLevel;
+    newGame.updateGameStatus = this.props.updateGameStatus;
+    newGame.toggleAiMode = this.props.toggleAiMode;
+
+    if (aiMode) newGame.aiMode = true;
+
+    this.game = newGame;
+    this.gameScene = gameScene;
+    this.gameCamera = gameCamera;
+    this.gameCamera.game = newGame;
+
+    this.props.updateScore(newGame.score);
+    this.props.updateLevel(newGame.levelStatus);
+  }
+
+  render = () => null;
 };
 
 
 const mapStateToProps = state => {
   return {
+    aiMode: state.game.aiMode,
+    level: state.game.level,
   }
 }
 
@@ -117,7 +147,8 @@ const mapDispatchToProps = dispatch => {
     updateScore: score => dispatch(updateScore(score)),
     updateLevel: level => dispatch(updateLevel(level)),
     updateGameStatus: status => dispatch(updateGameStatus(status)),
-    disableGrid: () => dispatch(disableGrid()),
+    toggleDisableGrid: () => dispatch(toggleDisableGrid()),
+    toggleAiMode: () => dispatch(toggleAiMode()),
   }
 }
 
