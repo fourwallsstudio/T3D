@@ -126,7 +126,7 @@ class Displays extends React.Component {
             "a": move left <br />
             "d": move right <br />
             "w": rotate piece <br />
-            "a": drop piece <br /><br />
+            "s": drop piece <br /><br />
             "p": play / pause game <br />
         </p>
         </div>
