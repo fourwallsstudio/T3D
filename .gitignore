@@ -6,3 +6,4 @@ bundle.js.map
 npm-debug.log
 newrelic_agent.log
 mongo_db.js
+package-lock.json
