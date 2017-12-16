@@ -4,7 +4,7 @@ T3D is a 3D spin on the classic Tetris game.
 
 [T3D][live]
 
-[live]: https://fourwallsstudio.github.io/T3D/
+[live]: http://t3d.herokuapp.com 
 
 ![image of main layout](/docs/screenshots/tetris_main.png)
 
