@@ -9,9 +9,9 @@
   },
   "scripts": {
     "test": "mocha",
-    "webpack": "webpack --watch",
+    "webpack": "webpack --config webpack.dev.js --watch",
     "start": "node server/start",
-    "postinstall": "webpack"
+    "postinstall": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
@@ -54,6 +54,8 @@
     "sequelize": "^4.4.3",
     "sequelize-cli": "^2.8.0",
     "three": "^0.86.0",
-    "webpack": "^3.0.0"
+    "uglifyjs-webpack-plugin": "^1.1.5",
+    "webpack": "^3.0.0",
+    "webpack-merge": "^4.1.1"
   }
 }
